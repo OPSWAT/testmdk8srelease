@@ -1,0 +1,53 @@
+
+# Create a service for each component in MD ICAP Server it has exposed ports
+{{ range $component_name, $component := .Values.icap_components }}
+{{ if $component.ports }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $component.name | quote }}
+  {{- if $component.service_annotations }}
+  annotations:
+    {{- toYaml $component.service_annotations | nindent 4 }}
+  {{- end }}
+spec:
+  ports:
+{{- if $component.ports.rest }}
+    - name: "rest-port"
+      port: {{ $component.ports.rest }}
+      targetPort: {{ $component.ports.rest }}
+{{- end }}
+{{- if $component.ports.icap }}
+    - name: "icap-port"
+      port: {{ $component.ports.icap }}
+      targetPort: {{ $component.ports.icap }}
+{{- end }}
+{{- if $component.ports.icaps }}
+    - name: "icaps-port"
+      port: {{ $component.ports.icaps }}
+      targetPort: {{ $component.ports.icaps }}
+{{- end }}
+{{- if $component.ports.nginx }}
+    - name: "nginx-port"
+      port: {{ $component.ports.nginx }}
+      targetPort: {{ $component.ports.nginx }}
+{{- end }}
+{{- if $component.ports.nginxs }}
+    - name: "nginxs-port"
+      port: {{ $component.ports.nginxs }}
+      targetPort: {{ $component.ports.nginxs }}
+{{- end }}
+  {{- if $component.service_type }}
+  type: {{ $component.service_type }}
+  {{- end }}
+  {{- if $component.sessionAffinity }}
+  sessionAffinity: {{ $component.sessionAffinity }}
+  {{- end }}
+  selector:
+      app: {{ $component.name | quote }}
+status:
+  loadBalancer: {}
+{{- end }}
+
+{{- end }}

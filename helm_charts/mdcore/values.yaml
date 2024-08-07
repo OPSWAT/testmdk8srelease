@@ -1,0 +1,335 @@
+
+## Uncomment the following lines to set a fixed user and password for the MD Core web interface that will overwrite 
+## any secret that already exists for these credentials (the secret will be kept when the chart is deleted)
+## If left unset the following will apply:
+## - if no "mdcore-cred" secret exists, it will be created with the user "admin" and a random password
+## - if the "mdcore-cred" secret exists, the values from the secret are used as credentials
+
+mdcore_user: admin                      # Initial admin user for the MD Core web interface
+mdcore_password: null                   # Initial admin password for the MD Core web interface, if not set it will be randomly generated
+
+
+## Uncomment the following lines to set a fixed user and password for the MD Core PostgreSQL database that will overwrite 
+## any secret that already exists for these credentials (the secret will be kept when the chart is deleted)
+## If left unset the following will apply:
+## - if no "mdcore-postgres-cred" secret exists, it will be created with the user "postgres" and a random password
+## - if the "mdcore-postgres-cred" secret exists, the values from the secret are used as credentials
+
+db_user: postgres                  # PostgreSQL database username 
+db_password: null                  # PostgreSQL database password, if not set it will be randomly generated
+
+
+## Uncomment the following line to set a fixed API key for MD Core that will overwrite 
+## any secret that already exists for API key (the secret will be kept when the chart is deleted)
+## If left unset the following will apply:
+## - if no "mdcore-api-key" secret exists, it will be created with a random 36 character API key
+## - if the "mdcore-api-key" secret exists, the value from the secret is used
+
+mdcore_api_key: null                    # 36 character API key used for the MD Core REST API, if not set it will be randomly generated
+
+
+## Set your MD Core license key here and it will be stored in the "mdcore-license-key" secret that will be created 
+## if it does not exist. If left unset then a a secret is generated with and empty license key.
+
+mdcore_license_key: <SET_LICENSE_KEY_HERE>    # A valid license key, **this value is mandatory**
+
+activation_server: activation.dl.opswat.com   # URL to the OPSWAT activation server, this value should not be changed
+
+## MD Core settings that are saved in the "mdcore_env" config map
+MDCORE_REST_PORT: "8008"            # Default port for the MD Core service
+MDCORE_DB_MODE: "4"                 # Database mode
+MDCORE_DB_TYPE: remote              # Database type
+MDCORE_DB_HOST: postgres-core       # Hostname / entrypoint of the database, this value should be changed any if using an external database service
+MDCORE_DB_PORT: "5432"              # Port for the PostgreSQL Database
+MDCORE_CERT_PATH: "/cert"
+
+RABBITMQ_DEFAULT_USER: rabbitmq
+RABBITMQ_DEFAULT_PASS: null          # RabbitMQ broker password, if not set it will be randomly generated
+
+CERT_KEY: |
+  <SET_MD_NAS_CERT_KEY>
+CERT: |
+  <SET_MD_NAS_CERT>
+
+ENABLED_MODULES: ""
+# ENABLED_MODULES: "mdhub"
+
+# Set to true if the respective database engine should also be deployed
+deploy_with_core_db: true           # Enable or disable the local in-cluster PostgreSQL database
+
+
+storage_configs: null        # Custom storage yaml, set to null for ephemeral or hostPath storage
+# storage_configs:              # Example using a PVC with dynamic provisioning from an existing storage class
+#   pvc-example:
+#     apiVersion: v1
+#     kind: PersistentVolumeClaim
+#     metadata:
+#       name: ocstorage
+#     spec:
+#       accessModes:
+#         - ReadWriteOnce
+#       resources:
+#         requests:
+#           storage: 1Gi
+#       storageClassName: <SET_STORAGE_CLASS_NAME>
+
+# Generate secrets for MD Core username, password, postgres user and password
+mdcore_generate_secrets: true
+
+# Available storage providers:
+# - hostPath: doesn't use any PVCs in the pod definitions and just mounts a path on the host starting with the hostPathPrefix
+# - custom: mounts from the PVC named as the storage_name value and uses component name as the subpath
+storage_provisioner: hostPath       # Type of storage to use in the pod definition
+storage_name: pvc-name              # Name of the PVC to use in the pod definition
+hostPathPrefix: mdcore-storage-<APP_NAMESPACE>      # The absolute path on the node where to keep the database filesystem for persistance
+
+
+# Ingress setting for md core (md core setting are ignored if deploy_with_core is false)
+core_ingress:
+  host: <APP_NAMESPACE>-mdcore.k8s       # Hostname for the publicly accessible ingress, the `<APP_NAMESPACE>` string will be replaced with the namespace where the chart is deployed
+  service: md-core                  # Service name where the ingress should route to, this should be left unchanged
+  port: 8008                        # Port where the ingress should route to
+  enabled: false                    # Enable or disable the ingress creation
+  spec_className: true              # true -> for adding class as spec || false -> for adding class as annotation. false for GKE as it needs to be as annotation.
+  class: ngnix                      # Sets the ingress class (For AWS alb, for GKE gce)
+  tls: false                        # Flag for set up tls section in ingress
+  secret: mdcore-tls                # SecretName of the tls secret created to be used for ingress
+  ingress_annotations: 
+    nginx.ingress.kubernetes.io/affinity: cookie     # To set affinity when having more than one pod running behind the ingress
+
+
+## Uncomment if you want to use a private repo (it must already be configured in the cluster as a secret)
+# imagePullSecrets:
+#   - name: regcred
+
+imagePullPolicy: IfNotPresent
+
+# Docker repo to use, this should be changed when using private images (this string will be prepended to the image name)
+# If a component has "custom_repo: true" then the image name will be formated as "{docker_repo/}image_name{:BRANCH}" otherwise it will remain unaltered
+core_docker_repo: opswat
+
+env:                                                            # Set additional environment variables for the MD Core container
+  CORE_CONF_JSON: '\{\"global/restaddress\": \"0.0.0.0\"\}'     # This sets MD Core to listen only on ipv4 addresses by default, remove this setting to listen also on ipv6 
+  # MD Core health-check settings
+  MDCORE_HEALTH_CHECK: true         # Enable the MD Core health-check
+  MDCORE_QUEUE_THRESHOLD: 0       # Maximum number of files in the queue
+  MDCORE_MINIMUM_NUMBER_AV: 0       # Minimum number of AV engines that should be available
+  MDCORE_REQUIRED_ENGINES: ""     # List of AV engines that should be available (ex: Bitdefender,clamav,eset), defaults to all engines available if not set and MDCORE_CORE_HEALTH_CHECK=true
+  # MD Core proxy settings
+  PROXY: false                # Enable the proxy settings in MD Core 
+  PROXY_HOST: ""            # Proxy server host address
+  PROXY_PORT: 8080            # Proxy server port
+  PROXY_USER: ""            # (optional) Username for proxy authentication
+  PROXY_PWD: ""             # (optional) Password for proxy authentication
+  PROXY_EXCLUSION: ""       # Not use the proxy server for the addresses starting with the following entries
+  # Licensing CleanUp
+  LICENSING_CLEANUP: "false"
+  # Upgrade Database Flags
+  MDCORE_UPGRADE_FROM_DB_NAME: "metadefender_core"
+  UPGRADE_DB: "false"
+  MIGRATE_HISTORY: "false"  # Only from version 5.10.1 See Pre-steps in docs.opswat.com 
+
+core_components:
+  postgres-core:
+    name: postgres-core
+    image: postgres:14.8
+    env:
+      - name: POSTGRES_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: mdcore-postgres-cred
+            key: password
+      - name: POSTGRES_USER
+        valueFrom:
+          secretKeyRef:
+            name: mdcore-postgres-cred
+            key: user
+    ports:
+      - port: 5432
+    is_db: true
+    persistentDir: /var/lib/postgresql/data
+    tls:
+      enabled: false
+
+  md-core:
+    name: md-core
+    image: opswat/metadefendercore-debian:5.10.1         # Overrides the default docker image for the MD Core service, this value can be changed if you want to set a different version of MD Core
+    replicas: 1                                         # Sets the number of replicas if you want to have multiple MD Core instances
+    env:
+      - name: MD_USER
+        valueFrom:
+          secretKeyRef:
+            name: mdcore-cred
+            key: user
+      - name: MD_PWD
+        valueFrom:
+          secretKeyRef:
+            name: mdcore-cred
+            key: password
+      - name: MD_INSTANCE_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.name
+      - name: MY_POD_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.name
+      - name: MY_POD_NAMESPACE
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.namespace
+      - name: APIKEY
+        valueFrom:
+          secretKeyRef:
+            name: mdcore-api-key
+            key: value
+      - name: LICENSE_KEY
+        valueFrom:
+          secretKeyRef:
+            name: mdcore-license-key
+            key: value
+      - name: DB_USER
+        valueFrom:
+          secretKeyRef:
+            name: mdcore-postgres-cred
+            key: user
+      - name: DB_PWD
+        valueFrom:
+          secretKeyRef:
+            name: mdcore-postgres-cred
+            key: password
+      - name: IGNITION_JSON
+        valueFrom: 
+          secretKeyRef:
+            name: mdcore-stack-configs
+            key: IGNITION_JSON
+    #  - name: LOG_PATH
+    #    value: /home/metascan/$(MD_INSTANCE_NAME)
+    #persistentDir: /home/metascan
+    tls:
+      enabled: false
+      certSecret: mdcore-tls-cert
+      certSecretSubPath: mdcore.crt
+      certKeySecret: mdcore-tls-cert-key
+      certKeySecretSubPath: mdcore.key
+    ports:
+      - port: 8008                                       # Port to expose for the MD Core pod
+    service_type: ClusterIP                              # Sets the service type for MD Core service (ClusterIP, NodePort, LoadBalancer)
+    sessionAffinity: None
+    service_annotations: null
+    extra_labels:
+      aws-type: fargate                                  # If `aws-type` is set to `fargate`, the MD Core pod will be scheduled on an AWS Fargate virtual node (if a fargate profile is provisioned and configured)
+      name: md-core                                      # Label needed for the ingress to find the service based on the name
+    resources:
+      requests:
+        memory: "7Gi"                                    # Minimum reserved memory
+        cpu: "4.0"                                       # Minimum reserved cpu
+      limits:
+        memory: "8Gi"                                    # Maximum memory limit
+        cpu: "8.0"                                       # Maximum cpu limit
+    readinessProbe:
+      httpGet:
+        # scheme: HTTPS
+        path: /readyz                                    # Health check endpoint
+        port: 8008
+      initialDelaySeconds: 60                             #  Number of seconds after the container has started before startup, liveness or readiness probes are initiated. Defaults to 0 seconds. Minimum value is 0.
+      periodSeconds: 10                                   # How often (in seconds) to perform the probe. Default to 10 seconds. Minimum value is 1.
+      timeoutSeconds: 10                                  # Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1.
+    livenessProbe:
+      httpGet:
+        # scheme: HTTPS
+        path: /readyz                                    # Health check endpoint
+        port: 8008                                       # Health check port
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 10
+      failureThreshold: 3
+    strategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxSurge: 0
+    initContainers:
+      - name: check-db-ready
+        image: opswat/metadefendercore-debian:5.10.1 
+        imagePullPolicy: IfNotPresent
+        envFrom:
+          - configMapRef:
+              name: mdcore-env
+        command: ['sh', '-c', 
+          'until pg_isready -h $DB_HOST -p $DB_PORT; 
+          do echo waiting for database; sleep 2; done;']
+
+
+#========================================== MDHUB MODULE ==========================================
+## To be used together with example file mdcore-mdhub-module.yml 
+  md-hub:
+    image: opswat/mdhub-debian:latest
+    name: md-hub
+    module_name: mdhub
+    ports:
+      - port: 8889
+    extraVolumeMounts:
+      - name: mdcore-stack-configs
+        mountPath: /etc/opswat/ometascan_hub.conf
+        subPath: ometascan_hub.conf
+    extraVolumes:
+      - name:  mdcore-stack-configs
+        secret:
+          secretName: mdcore-stack-configs
+      - name: wait-for-hub-services
+        configMap:
+          name:  wait-for-hub-services
+          defaultMode: 0777
+    initContainers:
+      - name: wait-for-hub-services
+        image: opswat/metadefendercore-debian:5.10.1 
+        imagePullPolicy: IfNotPresent
+        command: [ '/wait-for-hub-services.sh' ]
+        volumeMounts:
+          - name:  wait-for-hub-services
+            mountPath: /wait-for-hub-services.sh
+            subPath: wait-for-hub-services.sh
+          
+  md-nas:
+    image: opswat/mdnas-debian:latest
+    name: md-nas
+    module_name: mdhub
+    ports:
+      - port: 8888
+    extraVolumeMounts:
+      - name:  mdcore-stack-configs
+        mountPath: /etc/opswat/ometascan_nas.conf
+        subPath: ometascan_nas.conf
+      - name:  mdcore-stack-configs
+        mountPath: /etc/opswat/local.key
+        subPath: CERT_KEY
+      - name:  mdcore-stack-configs
+        mountPath: /etc/opswat/local.cert
+        subPath: CERT
+    extraVolumes:
+      - name: mdcore-stack-configs
+        secret:
+          secretName: mdcore-stack-configs
+  redis:
+    image: "redis:7.0.5"
+    name: redis
+    module_name: mdhub
+    ports:
+      - port: 6379
+  rabbitmq:
+    image: "rabbitmq:3.10.7"
+    name: rabbitmq
+    module_name: mdhub
+    env:
+      - name: RABBITMQ_DEFAULT_USER
+        valueFrom:
+          secretKeyRef:
+            name: mdcore-stack-configs
+            key: RABBITMQ_DEFAULT_USER
+      - name: RABBITMQ_DEFAULT_PASS
+        valueFrom:
+          secretKeyRef:
+            name: mdcore-stack-configs
+            key: RABBITMQ_DEFAULT_PASS
+    ports:
+      - port: 5672
