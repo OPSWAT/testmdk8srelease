@@ -1,0 +1,27 @@
+---
+{{- if .Values.storage_configs.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ printf "%s-pvc" .Values.storage_configs.storageClassName }}
+  annotations:
+    "helm.sh/resource-policy": keep
+spec:
+  accessModes:
+    {{- toYaml .Values.storage_configs.accessModes | nindent 4}}
+  resources:
+    requests:
+      storage: {{ .Values.storage_configs.resources.requests.storage }}
+  storageClassName: {{ .Values.storage_configs.storageClassName }}
+{{ end }}
+
+{{ if $.Values.extra_storage_configs }}
+
+{{ range $storage_name, $storage_value := .Values.extra_storage_configs }}
+---
+{{- toYaml $storage_value }}
+
+{{ end }}
+
+{{ end }}
+
