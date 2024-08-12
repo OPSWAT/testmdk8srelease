@@ -61,8 +61,8 @@ mdssc-common-environment:
   RABBITMQ_SCANNING_PREFETCH_COUNT: "20"
 
   HTTPS_ACTIVE: "no"
-  BRANCH: "3.4.1"          # Set MDSSC version (image tag)
-  # MDSSC BRANCH needed ?
+  BRANCH: "3.4.1"          # Set Platform version (image tag)
+  MDSSC_BRANCH: "stable"          # Set MDSSC version (image tag)
 
   # These variables can be changed to reveal debug information in the application
   LOG_LEVEL: "4"
@@ -295,579 +295,95 @@ mdssc_components:
         memory: "0.125Gi"
         cpu: "0.010"
 
-  commonservices:
-    name: commonservices
+  # ======================================= MDSSC MODULE ================================================ # 
+
+  frontend:
+    name: frontend
+    is_mdssc: true
     custom_repo: true
-    image: mdss_commonservices
+    image: "mdssc_frontend"
     ports:
-      - port: 5000
+      - port: 80
     extra_labels:
       aws-type: fargate
     resources:
       requests:
         memory: "0.125Gi"
         cpu: "0.010"
-  
-  # discoveryservice:
-  #   name: discoveryservice
-  #   custom_repo: true
-  #   image: mdcloudservices_discovery
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.5Gi"
-  #       cpu: "1.000"
-
-  # scanningservice:
-  #   name: scanningservice
-  #   custom_repo: true
-  #   image: mdcloudservices_scanning
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "1Gi"
-  #       cpu: "0.500"
-  
-  # notificationservice:
-  #   name: notificationservice
-  #   custom_repo: true
-  #   image: mdcloudservices_notification
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.010"
-
-  # jobdispatcher:
-  #   name: jobdispatcher
-  #   custom_repo: true
-  #   image: mdcloudservices_job-dispatcher
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.050"
-  
-  # securitychecklistservice:
-  #   name: securitychecklistservice
-  #   custom_repo: true
-  #   image: "mdcloudservices_security-checklist"
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.125Gi"
-  #       cpu: "0.010"
-
-  # loadbalancerservice:
-  #   name: loadbalancerservice
-  #   custom_repo: true
-  #   image: "mdcloudservices_load-balancer"
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.100"
-
-  # loggingservice:
-  #   name: loggingservice
-  #   custom_repo: true
-  #   image: "mdcloudservices_logging"
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.050"
-
-  # remediationsservice:
-  #   name: remediationsservice
-  #   custom_repo: true
-  #   image: mdcloudservices_remediations
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.100"
-  
-  # storagesservice:
-  #   name: storagesservice
-  #   custom_repo: true
-  #   image: mdcloudservices_storages
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.010"
-      
-  # workflowmanagerservice:
-  #   name: workflowmanagerservice
-  #   custom_repo: true
-  #   image: mdcloudservices_workflowmanager
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.100"
-  
-  # apigateway:
-  #   name: apigateway
-  #   custom_repo: true
-  #   image: mdcloudservices_api
-  #   env:
-  #     - name: ASPNETCORE_URLS
-  #       value: http://+
-  #   ports:
-  #     - port: 443
-  #     - port: 80
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.5Gi"
-  #       cpu: "0.100"
-
-  # webclient:
-  #   name: webclient
-  #   custom_repo: true
-  #   image: mdcloudservices_web
-  #   ports:
-  #     - port: 443
-  #     - port: 80
-  #   mountConfig:
-  #     configName: webclient-nginx-config
-  #     mountPath: /etc/nginx/conf.d/default.conf
-  #     subPath: default.conf
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.100"
-
-  # usermanagementservice:
-  #   name: usermanagementservice
-  #   custom_repo: true
-  #   image: mdcloudservices_usermanagement
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.010"
-
-  # # ======================================= AMAZONSDK MODULE ================================================
-  # discoveryamazonsdkservice:
-  #   name: discoveryamazonsdkservice
-  #   module_name: amazonsdk
-  #   custom_repo: true
-  #   image: mdcloudservices_discoveryamazonsdk
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "1.000"
-
-  # remediationsservice-amazonsdk:
-  #   name: remediationsservice-amazonsdk
-  #   module_name: amazonsdk
-  #   custom_repo: true
-  #   image: mdcloudservices_remediationsamazonsdk
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.100"
-  
-  # storagesservice-amazonsdk:
-  #   name: storagesservice-amazonsdk
-  #   module_name: amazonsdk
-  #   custom_repo: true
-  #   image: mdcloudservices_storagesamazonsdk
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.010"
-  # # ======================================= AZUREBLOB MODULE ================================================
-  # discoveryazureblobservice:
-  #   name: discoveryazureblobservice
-  #   module_name: azureblob
-  #   custom_repo: true
-  #   image: mdcloudservices_discoveryazureblob
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "1.000"
-
-  # remediationsservice-azureblob:
-  #   name: remediationsservice-azureblob
-  #   module_name: azureblob
-  #   custom_repo: true
-  #   image: mdcloudservices_remediationsazureblob
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.100"
-      
-  # storagesservice-azureblob:
-  #   name: storagesservice-azureblob
-  #   module_name: azureblob
-  #   custom_repo: true
-  #   image: mdcloudservices_storagesazureblob
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.010"
-  # # ======================================= ALIBABACLOUD MODULE ================================================
-  # discoveryalibabacloudservice:
-  #   name: discoveryalibabacloudservice
-  #   module_name: alibabacloud
-  #   custom_repo: true
-  #   image: mdcloudservices_discoveryalibabacloud
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "1.000"
-  
-  # remediationsservice-alibabacloud:
-  #   name: remediationsservice-alibabacloud
-  #   module_name: alibabacloud
-  #   custom_repo: true
-  #   image: mdcloudservices_remediationsalibabacloud
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.100"
-  
-  # storagesservice-alibabacloud:
-  #   name: storagesservice-alibabacloud
-  #   module_name: alibabacloud
-  #   custom_repo: true
-  #   image: mdcloudservices_storagesalibabacloud
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.010"
-  # # ======================================= GOOGLECLOUD MODULE ================================================
-  # discoverygooglecloudservice:
-  #   name: discoverygooglecloudservice
-  #   module_name: googlecloud
-  #   custom_repo: true
-  #   image: mdcloudservices_discoverygooglecloud
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "1.000"
-  
-  # remediationsservice-googlecloud:
-  #   name: remediationsservice-googlecloud
-  #   module_name: googlecloud
-  #   custom_repo: true
-  #   image: mdcloudservices_remediationsgooglecloud
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.100"
-  
-  # storagesservice-googlecloud:
-  #   name: storagesservice-googlecloud
-  #   module_name: googlecloud
-  #   custom_repo: true
-  #   image: mdcloudservices_storagesgooglecloud
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.010"
-  # # ======================================= BOX MODULE ================================================
-  # discoveryboxservice:
-  #   name: discoveryboxservice
-  #   module_name: box
-  #   custom_repo: true
-  #   image: mdcloudservices_discoverybox
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "1.000"
-  
-  # remediationsservice-box:
-  #   name: remediationsservice-box
-  #   module_name: box
-  #   custom_repo: true
-  #   image: mdcloudservices_remediationsbox
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.100"
-      
-  # storagesservice-box:
-  #   name: storagesservice-box
-  #   module_name: box
-  #   custom_repo: true
-  #   image: mdcloudservices_storagesbox
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.010"
-  # # ======================================= AZUREFILES MODULE ================================================
-  # discoveryazurefilesservice:
-  #   name: discoveryazurefilesservice
-  #   module_name: azurefiles
-  #   custom_repo: true
-  #   image: mdcloudservices_discoveryazurefiles
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "1.000"
-  
-  # remediationsservice-azurefiles:
-  #   name: remediationsservice-azurefiles
-  #   module_name: azurefiles
-  #   custom_repo: true
-  #   image: mdcloudservices_remediationsazurefiles
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.100"
-  
-  # storagesservice-azurefiles:
-  #   name: storagesservice-azurefiles
-  #   module_name: azurefiles
-  #   custom_repo: true
-  #   image: mdcloudservices_storagesazurefiles
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.010"
-  # # ======================================= SMB MODULE ================================================
-  # discoverysmbservice:
-  #   name: discoverysmbservice
-  #   module_name: smb
-  #   custom_repo: true
-  #   image: mdcloudservices_discoverysmb
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "1.000"
-  
-  # remediationsservice-smb:
-  #   name: remediationsservice-smb
-  #   module_name: smb
-  #   custom_repo: true
-  #   image: mdcloudservices_remediationssmb
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.100"
-  
-  # storagesservice-smb:
-  #   name: storagesservice-smb
-  #   module_name: smb
-  #   custom_repo: true
-  #   image: mdcloudservices_storagessmb
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.010"
-  
-  # smbservice:
-  #   name: smbservice
-  #   module_name: smb
-  #   custom_repo: true
-  #   image: mdcloudservices_smbservice
-  #   ports:
-  #     - port: 5002
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.5Gi"
-  #       cpu: "0.500"
-  # # ======================================= ONEDRIVE MODULE ================================================
-  # discoveryonedriveservice:
-  #   name: discoveryonedriveservice
-  #   module_name: onedrive
-  #   custom_repo: true
-  #   image: mdcloudservices_discoveryonedrive
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "1.000"
-  
-  # remediationsservice-onedrive:
-  #   name: remediationsservice-onedrive
-  #   module_name: onedrive
-  #   custom_repo: true
-  #   image: mdcloudservices_remediationsonedrive
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.100"
-      
-  # storagesservice-onedrive:
-  #   name: storagesservice-onedrive
-  #   module_name: onedrive
-  #   custom_repo: true
-  #   image: mdcloudservices_storagesonedrive
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.010"
-  
-  # # ======================================= SFTP MODULE ================================================
-  # discoverysftpservice:
-  #   name: discoverysftpservice
-  #   module_name: sftp
-  #   custom_repo: true
-  #   image: mdcloudservices_discoverysftp
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "1.000"
-  
-  # remediationsservice-sftp:
-  #   name: remediationsservice-sftp
-  #   module_name: sftp
-  #   custom_repo: true
-  #   image: mdcloudservices_remediationssftp
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.100"
-  
-  # storagesservice-sftp:
-  #   name: storagesservice-sftp
-  #   module_name: sftp
-  #   custom_repo: true
-  #   image: mdcloudservices_storagessftp
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.010"
-  
-  # sftpservice:
-  #   name: sftpservice
-  #   module_name: sftp
-  #   custom_repo: true
-  #   image: mdcloudservices_sftpservice
-  #   ports:
-  #     - port: 5003
-  #   extra_labels:
-  #     aws-type: fargate
-  #   env:
-  #     - name: ASPNETCORE_URLS
-  #       value: http://+
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.500"
-      
-  # # ======================================= NFS MODULE ================================================
-  # discoverynfsservice:
-  #   name: discoverynfsservice
-  #   module_name: nfs
-  #   custom_repo: true
-  #   image: mdcloudservices_discoverynfs
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "1.000"
-  
-  # remediationsservice-nfs:
-  #   name: remediationsservice-nfs
-  #   module_name: nfs
-  #   custom_repo: true
-  #   image: mdcloudservices_remediationsnfs
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.100"
-  
-  # storagesservice-nfs:
-  #   name: storagesservice-nfs
-  #   module_name: nfs
-  #   custom_repo: true
-  #   image: mdcloudservices_storagesnfs
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.25Gi"
-  #       cpu: "0.010"
-  
-  # nfsservice:
-  #   name: nfsservice
-  #   module_name: nfs
-  #   custom_repo: true
-  #   image: mdcloudservices_nfsservice
-  #   ports:
-  #     - port: 5004
-  #   extra_labels:
-  #     aws-type: fargate
-  #   resources:
-  #     requests:
-  #       memory: "0.5Gi"
-  #       cpu: "0.500"
+  api:
+    name: api
+    is_mdssc: true
+    custom_repo: true
+    image: "mdssc_api"
+    extra_labels:
+      aws-type: fargate
+    resources:
+      requests:
+        memory: "0.125Gi"
+        cpu: "0.010"
+  github:
+    name: github
+    is_mdssc: true
+    custom_repo: true
+    image: "mdssc_github"
+    extra_labels:
+      aws-type: fargate
+    resources:
+      requests:
+        memory: "0.125Gi"
+        cpu: "0.010"
+  binaries:
+    name: binaries
+    is_mdssc: true
+    custom_repo: true
+    image: "mdssc_binaries"
+    extra_labels:
+      aws-type: fargate
+    resources:
+      requests:
+        memory: "0.125Gi"
+        cpu: "0.010"
+  dockerhub:
+    name: dockerhub
+    is_mdssc: true
+    custom_repo: true
+    image: "mdssc_dockerhub"
+    extra_labels:
+      aws-type: fargate
+    resources:
+      requests:
+        memory: "0.125Gi"
+        cpu: "0.010"
+  ecr:
+    name: ecr
+    is_mdssc: true
+    custom_repo: true
+    image: "mdssc_ecr"
+    extra_labels:
+      aws-type: fargate
+    resources:
+      requests:
+        memory: "0.125Gi"
+        cpu: "0.010"
+  quay:
+      name: quay
+      is_mdssc: true
+      custom_repo: true
+      image: "mdssc_quay"
+      extra_labels:
+        aws-type: fargate
+      resources:
+        requests:
+          memory: "0.125Gi"
+          cpu: "0.010"
+  containers:
+      name: containers
+      is_mdssc: true
+      custom_repo: true
+      image: "mdssc_containers"
+      extra_labels:
+        aws-type: fargate
+      resources:
+        requests:
+          memory: "0.125Gi"
+          cpu: "0.010"
