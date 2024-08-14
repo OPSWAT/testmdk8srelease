@@ -13,6 +13,7 @@ mdssc-common-environment:
   CONTAINERS_BRANCH: "main"
   NOTIFICATIONS_BRANCH: "main"
   MDSS_TAG: "master"
+  # BRANCH: "platform"
 
   DISCOVERY_STRATEGY: "ImageArchiveDiscovery"
 
@@ -23,8 +24,7 @@ mdssc-common-environment:
   PRODUCT_NAME_SHORT: "MDSSC"
   EULA_ACCEPTED_AFTER_UPGRADE: "yes"
 
-  ENABLED_MODULES: "azureblob,amazonsdk,nfs"                                  # Enabled modules by default
-  # ENABLED_MODULES: "azureblob,amazonsdk,googlecloud,alibabacloud,azurefiles,smb,box,onedrive,sftp,debug"             # All supported modules
+  ENABLED_MODULES: "github,dockerhub,bitbucket,amazonecr,quay,jfrogcontainer,jfrogbinary"
 
   # This defines the connection string to the db ( should be modified when using an external db)
   MONGO_URL: "mongodb://mongodb:27017/MDCS"
