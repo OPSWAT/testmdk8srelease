@@ -1,19 +1,6 @@
 # Default values for mdssc. These will also be included in the environment of each mdssc container
 
 mdssc-common-environment:
-  #TAG=main
-  MONGO_MIGRATIONS_BRANCH: "main" # where should this be used?
-  API_BRANCH: "main"
-  BINARIES_BRANCH: "main"
-  GITHUB_BRANCH: "main"
-  DOCKERHUB_BRANCH: "main"
-  FRONTEND_BRANCH: "main"
-  ECR_BRANCH: "main"
-  QUAY_BRANCH: "main"
-  CONTAINERS_BRANCH: "main"
-  NOTIFICATIONS_BRANCH: "main"
-  MDSS_TAG: "master"
-  # BRANCH: "platform"
 
   DISCOVERY_STRATEGY: "ImageArchiveDiscovery"
 
