@@ -20,7 +20,7 @@ docker run --rm \
     apk add --no-cache git openssh &&
     chmod 600 /root/.ssh/gh_rsa &&
     GIT_SSH_COMMAND='ssh -i /root/.ssh/gh_rsa -o StrictHostKeyChecking=no -o IdentitiesOnly=yes' git clone git@github.com:OPSWAT/metadefender-k8s.git &&
-    cd metadefender-k8s-internal &&
+    cd metadefender-k8s &&
     GIT_SSH_COMMAND='ssh -i /root/.ssh/gh_rsa -o IdentitiesOnly=yes' git checkout -b $RELEASE_VERSION &&
     git config --global user.email 'buildautomation@opswat.com' &&
     git config --global user.name 'Build Automation' &&
