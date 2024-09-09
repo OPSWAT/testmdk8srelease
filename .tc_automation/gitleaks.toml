@@ -19,6 +19,8 @@ paths = [
     '''pnpm-lock.yaml''',
     '''Database.refactorlog''',
     '''vendor''',
+    '''nginx-icap-module-v1.20.1.yml''',
+    '''nginx-icap-module-v1.21.6.yml'''
 ]
 
 [[rules]]
