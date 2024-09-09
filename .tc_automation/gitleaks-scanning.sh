@@ -1,14 +1,9 @@
 #!/bin/bash
 #
-# Script for scanning the mdss repo with GitLeaks
-# Parameters:
-# $1 - teamcity build checkout dir
-
-cd $1
+# Script for scanning the Bitbuckcet metadefender-k8s repo with GitLeaks
+rm -rf gitleaksReports
 mkdir gitleaksReports
+chmod +777 gitleaksReports
 
-if [[ -d $1 ]] 
-then 
-    echo "Scanning started"
-    gitleaks detect -c gitleaks.toml -s . -v --no-git --redact -r ./gitleaksReports/gitleaks.json
-fi
+echo "Scanning started"
+docker run -v .:/path zricethezav/gitleaks:latest detect --source="/path" --no-git -c /path/.tc_automation/gitleaks.toml --redact -r /path/gitleaksReports/gitleaks.json
