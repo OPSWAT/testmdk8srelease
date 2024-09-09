@@ -1,6 +1,3 @@
-#!/bin/bash
-#
-# Script for scanning the Bitbuckcet metadefender-k8s repo with GitLeaks
 rm -rf gitleaksReports
 mkdir gitleaksReports
 chmod +777 gitleaksReports
