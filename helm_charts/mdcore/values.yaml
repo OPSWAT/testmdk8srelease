@@ -108,7 +108,7 @@ imagePullPolicy: IfNotPresent
 # If a component has "custom_repo: true" then the image name will be formated as "{docker_repo/}image_name{:BRANCH}" otherwise it will remain unaltered
 core_docker_repo: opswat
 
-env:
+env:                                                            # Set additional environment variables for the MD Core container
   CORE_CONF_JSON: '{"global/restaddress": "0.0.0.0"}'           # This sets MD Core to listen only on ipv4 addresses by default, remove this setting to listen also on ipv6 
   # MD Core health-check settings
   MDCORE_HEALTH_CHECK: true         # Enable the MD Core health-check
