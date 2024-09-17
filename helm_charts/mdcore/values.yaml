@@ -128,6 +128,7 @@ env:                                                            # Set additional
   MDCORE_UPGRADE_FROM_DB_NAME: "metadefender_core"
   UPGRADE_DB: "false"
   MIGRATE_HISTORY: "false"  # Only from version 5.10.1 See Pre-steps in docs.opswat.com 
+  MDCORE_LICENSE_COMMENT: ""
 
 core_components:
   postgres-core:
