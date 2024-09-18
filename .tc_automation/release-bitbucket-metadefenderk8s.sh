@@ -1,7 +1,6 @@
 echo "### Reading Params"
 SSH_KEY=$1
 RELEASE_VERSION=$2
-echo "SSH_KEY=$SSH_KEY"
 echo "RELEASE_VERSION=$RELEASE_VERSION"
 
 echo "### Setting GitHub Key"
