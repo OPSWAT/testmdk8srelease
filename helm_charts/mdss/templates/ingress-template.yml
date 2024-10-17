@@ -16,7 +16,8 @@ spec:
   ingressClassName: {{ .Values.mdss_ingress.class }}
   {{ end }}
   {{ if .Values.mdss_ingress.rules }}
-  rules: {{ .Values.mdss_ingress.rules }}
+  rules: 
+    {{- toYaml .Values.mdss_ingress.rules | nindent 4 }}
   {{ else }}
   rules:
   - host: {{ .Values.mdss_ingress.host | replace "<APP_NAMESPACE>" .Release.Namespace }}
