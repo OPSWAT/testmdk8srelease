@@ -853,3 +853,41 @@ mdss_components:
       requests:
         memory: "0.5Gi"
         cpu: "0.500"
+
+ # ======================================= MFT MODULE ================================================
+  discoverymftservice:
+    name: discoverymftservice
+    module_name: mft
+    custom_repo: true
+    image: mdcloudservices_discoverymft
+    extra_labels:
+      aws-type: fargate
+    resources:
+      requests:
+        memory: "0.25Gi"
+        cpu: "1.000"
+  
+  remediationsservice-mft:
+    name: remediationsservice-mft
+    module_name: mft
+    custom_repo: true
+    image: mdcloudservices_remediationsmft
+    extra_labels:
+      aws-type: fargate
+    resources:
+      requests:
+        memory: "0.25Gi"
+        cpu: "0.100"
+      
+  storagesservice-mft:
+    name: storagesservice-mft
+    module_name: mft
+    custom_repo: true
+    image: mdcloudservices_storagesmft
+    extra_labels:
+      aws-type: fargate
+    resources:
+      requests:
+        memory: "0.25Gi"
+        cpu: "0.010"
+  
