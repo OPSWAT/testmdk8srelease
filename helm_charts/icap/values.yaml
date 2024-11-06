@@ -140,7 +140,7 @@ icap_components:
             cpu: "100m"       # Maximum cpu limit
     name: md-icapsrv
     # Overrides the default docker image for the MD ICAP Server service, this value can be changed if you want to set a different version of MD ICAP Server
-    image: opswat/metadefendericapsrv-debian:5.6.0
+    image: opswat/metadefendericapsrv-debian:5.5.1
     # Warning: When to use this feature!
     # Sets the number of replicas if you want to have multiple MD ICAP Server instances
     replicas: 1
@@ -278,12 +278,12 @@ icap_components:
         cpu: "4.0"                  # Maximum cpu limit
     imagePullPolicy: IfNotPresent
     livenessProbe:
-      initialDelaySeconds: 90
+      initialDelaySeconds: 30
       periodSeconds: 10
       timeoutSeconds: 10
       failureThreshold: 3
     readinessProbe:
-      initialDelaySeconds: 60
+      initialDelaySeconds: 10
       periodSeconds: 3
       timeoutSeconds: 3
       failureThreshold: 3
