@@ -278,12 +278,12 @@ icap_components:
         cpu: "4.0"                  # Maximum cpu limit
     imagePullPolicy: IfNotPresent
     livenessProbe:
-      initialDelaySeconds: 30
+      initialDelaySeconds: 90
       periodSeconds: 10
       timeoutSeconds: 10
       failureThreshold: 3
     readinessProbe:
-      initialDelaySeconds: 10
+      initialDelaySeconds: 60
       periodSeconds: 3
       timeoutSeconds: 3
       failureThreshold: 3
