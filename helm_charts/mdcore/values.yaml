@@ -130,6 +130,13 @@ env:                                                            # Set additional
   MIGRATE_HISTORY: "false"  # Only from version 5.10.1 See Pre-steps in docs.opswat.com 
   MDCORE_LICENSE_COMMENT: ""
 
+hpa:
+  deployment: md-core
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  cpuTargetUtilization: 85
+
 core_components:
   postgres-core:
     name: postgres-core
