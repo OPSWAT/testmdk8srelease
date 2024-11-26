@@ -223,7 +223,7 @@ mdssHostAliases:                              # Custom hosts entries
 mdss_components:
   mongodb:
     name: mongodb
-    image: mongo:3.6
+    image: mongo:6.0
     ports:
       - port: 27017
     persistentDir: /data/db
