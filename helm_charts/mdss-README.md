@@ -54,6 +54,10 @@ The helm chart is configured by default to use the latest compatible version of 
 
 The MongoDB upgrade procedure needs to be done sequentially following all intermediate releases.
 
+The following components are non-persistent and can be updated to the latest compatible version by setting the respective image tag:
+ - RabbitMQ: rabbitmq:3.11.4-management
+ - Redis Cache: redis:7.0
+
 ## Operational Notes
 The entire deployment can be customized by overwriting the chart's default configuration values. Here are a few point to look out for when changing these values:
 - By default, a MongoDB database is deployed alongside the MDSS deployment
