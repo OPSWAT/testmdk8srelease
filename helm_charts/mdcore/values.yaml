@@ -230,11 +230,9 @@ core_components:
       name: md-core                                      # Label needed for the ingress to find the service based on the name
     resources:
       requests:
-        memory: "7Gi"                                    # Minimum reserved memory
+        memory: "4Gi"                                    # Minimum reserved memory
         cpu: "4.0"                                       # Minimum reserved cpu
-      limits:
-        memory: "8Gi"                                    # Maximum memory limit
-        cpu: "8.0"                                       # Maximum cpu limit
+        ephemeral-storage: "60Gi"                        # Minimum reserved storage
     readinessProbe:
       httpGet:
         # scheme: HTTPS
