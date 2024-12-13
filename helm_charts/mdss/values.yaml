@@ -232,6 +232,7 @@ mdss_components:
       requests:
         memory: "2Gi"
         cpu: "0.5"
+        ephemeral-storage: "10Gi"
 
   mongomigrations:
     name: mongomigrations
@@ -244,6 +245,7 @@ mdss_components:
       requests:
         memory: "0.125Gi"
         cpu: "0.010"
+        ephemeral-storage: "0.25Gi"
 
   rabbitmq:
     name: rabbitmq
@@ -264,6 +266,7 @@ mdss_components:
       requests:
         memory: "0.5Gi"
         cpu: "0.5"
+        ephemeral-storage: "1Gi"
   
   redis:
     name: redis
@@ -276,6 +279,7 @@ mdss_components:
       requests:
         memory: "0.125Gi"
         cpu: "0.100"
+        ephemeral-storage: "0.2Gi"
 
   licensingservice:
     name: licensingservice
@@ -289,6 +293,7 @@ mdss_components:
       requests:
         memory: "0.125Gi"
         cpu: "0.010"
+        ephemeral-storage: "0.25Gi"
   
   discoveryservice:
     name: discoveryservice
@@ -300,6 +305,7 @@ mdss_components:
       requests:
         memory: "0.5Gi"
         cpu: "1.000"
+        ephemeral-storage: "0.5Gi"
 
   scanningservice:
     name: scanningservice
@@ -311,6 +317,7 @@ mdss_components:
       requests:
         memory: "1Gi"
         cpu: "0.500"
+        ephemeral-storage: "0.5Gi"
   
   notificationservice:
     name: notificationservice
@@ -322,6 +329,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.010"
+        ephemeral-storage: "0.5Gi"
 
   jobdispatcher:
     name: jobdispatcher
@@ -333,6 +341,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.050"
+        ephemeral-storage: "0.5Gi"
   
   securitychecklistservice:
     name: securitychecklistservice
@@ -344,6 +353,7 @@ mdss_components:
       requests:
         memory: "0.125Gi"
         cpu: "0.010"
+        ephemeral-storage: "0.5Gi"
 
   loadbalancerservice:
     name: loadbalancerservice
@@ -355,6 +365,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.100"
+        ephemeral-storage: "0.5Gi"
 
   loggingservice:
     name: loggingservice
@@ -366,6 +377,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.050"
+        ephemeral-storage: "0.5Gi"
 
   remediationsservice:
     name: remediationsservice
@@ -377,6 +389,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.100"
+        ephemeral-storage: "0.5Gi"
   
   storagesservice:
     name: storagesservice
@@ -388,6 +401,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.010"
+        ephemeral-storage: "0.5Gi"
       
   workflowmanagerservice:
     name: workflowmanagerservice
@@ -399,6 +413,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.100"
+        ephemeral-storage: "0.5Gi"
   
   apigateway:
     name: apigateway
@@ -416,6 +431,7 @@ mdss_components:
       requests:
         memory: "0.5Gi"
         cpu: "0.100"
+        ephemeral-storage: "0.5Gi"
 
   webclient:
     name: webclient
@@ -434,6 +450,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.100"
+        ephemeral-storage: "0.5Gi"
 
   usermanagementservice:
     name: usermanagementservice
@@ -445,6 +462,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.010"
+        ephemeral-storage: "0.5Gi"
 
   # ======================================= AMAZONSDK MODULE ================================================
   discoveryamazonsdkservice:
@@ -458,6 +476,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "1.000"
+        ephemeral-storage: "0.5Gi"
 
   remediationsservice-amazonsdk:
     name: remediationsservice-amazonsdk
@@ -470,6 +489,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.100"
+        ephemeral-storage: "1Gi"
   
   storagesservice-amazonsdk:
     name: storagesservice-amazonsdk
@@ -482,6 +502,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.010"
+        ephemeral-storage: "0.5Gi"
   # ======================================= AZUREBLOB MODULE ================================================
   discoveryazureblobservice:
     name: discoveryazureblobservice
@@ -494,6 +515,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "1.000"
+        ephemeral-storage: "0.5Gi"
 
   remediationsservice-azureblob:
     name: remediationsservice-azureblob
@@ -506,6 +528,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.100"
+        ephemeral-storage: "1Gi"
       
   storagesservice-azureblob:
     name: storagesservice-azureblob
@@ -518,6 +541,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.010"
+        ephemeral-storage: "0.5Gi"
   # ======================================= ALIBABACLOUD MODULE ================================================
   discoveryalibabacloudservice:
     name: discoveryalibabacloudservice
@@ -530,6 +554,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "1.000"
+        ephemeral-storage: "0.5Gi"
   
   remediationsservice-alibabacloud:
     name: remediationsservice-alibabacloud
@@ -542,6 +567,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.100"
+        ephemeral-storage: "1Gi"
   
   storagesservice-alibabacloud:
     name: storagesservice-alibabacloud
@@ -554,6 +580,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.010"
+        ephemeral-storage: "0.5Gi"
   # ======================================= GOOGLECLOUD MODULE ================================================
   discoverygooglecloudservice:
     name: discoverygooglecloudservice
@@ -566,6 +593,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "1.000"
+        ephemeral-storage: "0.5Gi"
   
   remediationsservice-googlecloud:
     name: remediationsservice-googlecloud
@@ -578,6 +606,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.100"
+        ephemeral-storage: "1Gi"
   
   storagesservice-googlecloud:
     name: storagesservice-googlecloud
@@ -590,6 +619,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.010"
+        ephemeral-storage: "0.5Gi"
   # ======================================= BOX MODULE ================================================
   discoveryboxservice:
     name: discoveryboxservice
@@ -602,6 +632,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "1.000"
+        ephemeral-storage: "0.5Gi"
   
   remediationsservice-box:
     name: remediationsservice-box
@@ -614,6 +645,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.100"
+        ephemeral-storage: "1Gi"
       
   storagesservice-box:
     name: storagesservice-box
@@ -626,6 +658,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.010"
+        ephemeral-storage: "0.5Gi"
   # ======================================= AZUREFILES MODULE ================================================
   discoveryazurefilesservice:
     name: discoveryazurefilesservice
@@ -638,6 +671,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "1.000"
+        ephemeral-storage: "0.5Gi"
   
   remediationsservice-azurefiles:
     name: remediationsservice-azurefiles
@@ -650,6 +684,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.100"
+        ephemeral-storage: "1Gi"
   
   storagesservice-azurefiles:
     name: storagesservice-azurefiles
@@ -662,6 +697,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.010"
+        ephemeral-storage: "0.5Gi"
   # ======================================= SMB MODULE ================================================
   discoverysmbservice:
     name: discoverysmbservice
@@ -674,6 +710,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "1.000"
+        ephemeral-storage: "0.5Gi"
   
   remediationsservice-smb:
     name: remediationsservice-smb
@@ -686,6 +723,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.100"
+        ephemeral-storage: "1Gi"
   
   storagesservice-smb:
     name: storagesservice-smb
@@ -698,6 +736,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.010"
+        ephemeral-storage: "0.5Gi"
   
   smbservice:
     name: smbservice
@@ -712,6 +751,7 @@ mdss_components:
       requests:
         memory: "0.5Gi"
         cpu: "0.500"
+        ephemeral-storage: "0.5Gi"
   # ======================================= ONEDRIVE MODULE ================================================
   discoveryonedriveservice:
     name: discoveryonedriveservice
@@ -724,6 +764,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "1.000"
+        ephemeral-storage: "0.5Gi"
   
   remediationsservice-onedrive:
     name: remediationsservice-onedrive
@@ -736,6 +777,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.100"
+        ephemeral-storage: "1Gi"
       
   storagesservice-onedrive:
     name: storagesservice-onedrive
@@ -748,6 +790,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.010"
+        ephemeral-storage: "0.5Gi"
   
   # ======================================= SFTP MODULE ================================================
   discoverysftpservice:
@@ -761,6 +804,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "1.000"
+        ephemeral-storage: "0.5Gi"
   
   remediationsservice-sftp:
     name: remediationsservice-sftp
@@ -773,6 +817,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.100"
+        ephemeral-storage: "1Gi"
   
   storagesservice-sftp:
     name: storagesservice-sftp
@@ -785,6 +830,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.010"
+        ephemeral-storage: "0.5Gi"
   
   sftpservice:
     name: sftpservice
@@ -802,6 +848,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.500"
+        ephemeral-storage: "0.5Gi"
       
   # ======================================= NFS MODULE ================================================
   discoverynfsservice:
@@ -815,6 +862,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "1.000"
+        ephemeral-storage: "0.5Gi"
   
   remediationsservice-nfs:
     name: remediationsservice-nfs
@@ -827,6 +875,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.100"
+        ephemeral-storage: "1Gi"
   
   storagesservice-nfs:
     name: storagesservice-nfs
@@ -839,6 +888,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.010"
+        ephemeral-storage: "0.5Gi"
   
   nfsservice:
     name: nfsservice
@@ -853,6 +903,7 @@ mdss_components:
       requests:
         memory: "0.5Gi"
         cpu: "0.500"
+        ephemeral-storage: "0.5Gi"
 
  # ======================================= MFT MODULE ================================================
   discoverymftservice:
@@ -866,6 +917,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "1.000"
+        ephemeral-storage: "0.5Gi"
   
   remediationsservice-mft:
     name: remediationsservice-mft
@@ -878,6 +930,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.100"
+        ephemeral-storage: "1Gi"
       
   storagesservice-mft:
     name: storagesservice-mft
@@ -890,4 +943,5 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.010"
+        ephemeral-storage: "0.5Gi"
   
