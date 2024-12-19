@@ -129,6 +129,19 @@ env:                                                            # Set additional
   UPGRADE_DB: "false"
   MIGRATE_HISTORY: "false"  # Only from version 5.10.1 See Pre-steps in docs.opswat.com 
   MDCORE_LICENSE_COMMENT: ""
+  OLMS_HOST_URL: ""
+  OLMS_TOKEN: ""
+  OLMS_REST_PORT: ""
+  OLMS_SOCKET_PORT: ""
+  OLMS_RULE: ""
+  OLMS_COMMENT: ""
+  OLMS_USE_PROXY: false
+  OLMS_PROXY_SERVER: ""
+  OLMS_PROXY_PORT: ""
+  OLMS_PROXY_USERNAME: ""
+  OLMS_PROXY_PASSWORD: ""
+  OLMS_PROXY_TYPE: ""         
+  OLMS_CONNECTION_TYPE: ""
 
 hpa:
   deployment: md-core
