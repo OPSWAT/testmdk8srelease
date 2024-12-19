@@ -48,8 +48,8 @@ mdssc-common-environment:
   RABBITMQ_SCANNING_PREFETCH_COUNT: "20"
 
   HTTPS_ACTIVE: "no"
-  BRANCH: "platform-1.4"          # Set Platform version (image tag)
-  MDSSC_BRANCH: "2.3.2"          # Set MDSSC version (image tag)
+  BRANCH: "platform-1.6"          # Set Platform version (image tag)
+  MDSSC_BRANCH: "2.4.0"          # Set MDSSC version (image tag)
 
   # These variables can be changed to reveal debug information in the application
   LOG_LEVEL: "4"
@@ -380,6 +380,17 @@ mdssc_components:
       is_mdssc: true
       custom_repo: true
       image: "mdssc_containers"
+      extra_labels:
+        aws-type: fargate
+      resources:
+        requests:
+          memory: "0.125Gi"
+          cpu: "0.010"
+  sourcecode:
+      name: sourcecode
+      is_mdssc: true
+      custom_repo: true
+      image: "mdssc_sourcecode"
       extra_labels:
         aws-type: fargate
       resources:
