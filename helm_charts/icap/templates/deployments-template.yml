@@ -77,6 +77,10 @@ spec:
             timeoutSeconds: {{ $component.livenessProbe.timeoutSeconds }}
             failureThreshold: {{ $component.livenessProbe.failureThreshold }}
           {{- end }}
+          {{- if $component.securityContext }}
+          securityContext:
+            {{- toYaml $component.securityContext | nindent 12 }}
+          {{- end }}
           {{- if $component.readinessProbe }}
           readinessProbe:
             httpGet:
@@ -153,7 +157,7 @@ spec:
             {{- toYaml $component.sidecars | nindent 8 }}
           {{- end }}
       {{- if ($component.initContainers)}}
-      {{- if (eq $component.database.db_mode "4")}}
+      {{- if (eq $component.database.db_type "remote")}}
       initContainers:
         {{- toYaml $component.initContainers | nindent 8 }}
       {{- end }}
