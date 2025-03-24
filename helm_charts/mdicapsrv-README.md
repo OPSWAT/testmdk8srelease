@@ -51,6 +51,12 @@ The following table lists the configurable parameters of the Metadefender ICAP c
 | `olms.olms_socket_port` | Default Socket port for the Opswat License Manager Server | `"3316"` |
 | `olms.olms_rule` | Default rule for active license on the Opswat License Manager Server | `"Default_Rule"` |
 | `olms.olms_comment` | Set the comment for the Opswat License Manager Server | `""` |
+| `olms.olms_use_proxy` | Use the proxy for the Opswat License Manager Server | `"false"` |
+| `olms.olms_proxy_server` | The proxy server host for the Opswat License Manager Server | `""` |
+| `olms.olms_proxy_port` | The proxy server port for the Opswat License Manager Server | `""` |
+| `olms.olms_proxy_username` | The proxy username support for authenticate | `""` |
+| `olms.olms_proxy_password` | The proxy password support for authenticate | `""` |
+| `olms.olms_proxy_type` | The proxy type support for the Opswat License Manager Server | `""` |
 | `proxy.enabled` | Set the value to `true` to use the proxy feature | `"false"` |
 | `proxy.http_proxy` | This environment variable defines the proxy server to be used for HTTP requests | `""` |
 | `proxy.https_proxy` | This environment variable specifies the proxy server for HTTPS requests | `""` |
@@ -148,8 +154,12 @@ The following table lists the configurable parameters of the Metadefender ICAP c
 - To have a file "mdicapsrv-config.json" correctly, please install a MD ICAP Server, do configuration setting then use export feature to get the json config file.
 - Please specific value of the secret template file for enable HTTPS, ICAPS or NGINXs. Need to mapping the key of the secret HTTPS, ICAPS and NGINXS with `*.certSecretSubPath` and `*.certKeySecretSubPath`
 ## Release note
+### v5.7.0
+- Support deploy Postgres version 16.6
+- Support run as non root container <ul><li>UID: 1000</li><li>GID: 1000</li></ul>
 ### v5.6.0
-- Focused on new functionalities, enhancements and bug fixes
+- Support proxy for OLMS socket via environment variables: `olms.olms_use_proxy` `olms.olms_proxy_server` `olms.olms_proxy_port` `olms.olms_proxy_username` `olms.olms_proxy_password` `olms.olms_proxy_type`
+- Prevent losing ICAP processing history on K8S when upgrade to newer version
 ### v5.5.1
 - Support proxy through environment: `proxy.enabled` `proxy.http_proxy` `proxy.https_proxy` `proxy.no_proxy` 
 ### v5.5.0
