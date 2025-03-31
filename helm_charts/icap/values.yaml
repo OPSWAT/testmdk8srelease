@@ -147,7 +147,7 @@ icap_components:
     name: md-icapsrv
     custom_repo: true
     # Overrides the default docker image for the MD ICAP Server service, this value can be changed if you want to set a different version of MD ICAP Server
-    image: metadefendericapsrv-debian:5.7.0
+    image: metadefendericapsrv-debian:5.8.0
     # Warning: When to use this feature!
     # Sets the number of replicas if you want to have multiple MD ICAP Server instances
     replicas: 1
@@ -280,9 +280,11 @@ icap_components:
     #      claimName: icap-disk-pvc
     resources:
       requests:
-        memory: "4Gi"               # Minimum reserved memory
+        memory: "2Gi"               # Minimum reserved memory
         cpu: "2.0"                  # Minimum reserved cpu
-        ephemeral-storage: "25Gi"   # Minimum reserved storage
+      limits:                        
+        memory: "4Gi"               # Maximum memory limit
+        cpu: "4.0"                  # Maximum cpu limit
     imagePullPolicy: IfNotPresent
     livenessProbe:
       initialDelaySeconds: 30

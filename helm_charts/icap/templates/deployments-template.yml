@@ -43,8 +43,8 @@ spec:
             - configMapRef:
                 name: mdicapsrv-env
           {{- if $component.custom_repo }}
-          image: {{ printf "%s/%s:%s" $.Values.icap_docker_repo $component.image | quote }}
-          {{ else }}
+          image: {{ printf "%s/%s" $.Values.icap_docker_repo $component.image | quote }}
+          {{- else }}
           image: {{ $component.image | quote }}
           {{- end }}
           {{- if $ENV }}
