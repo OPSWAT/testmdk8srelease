@@ -274,6 +274,7 @@ mdss_components:
     ports:
       - port: 5672
       - port: 15672
+      - port: 15692
     mountConfig:
       configName: rabbitmq-config
       mountPath: /data/rabbitmq/advanced.config
