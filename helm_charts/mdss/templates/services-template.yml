@@ -3,7 +3,6 @@
 {{ if and $component.ports ( or (not $component.module_name) (contains (print $component.module_name) (index $.Values "mdss-common-environment").ENABLED_MODULES)) }}
 
 {{ if and (not $.Values.deploy_with_mdss_db) $component.is_db }}
-
 {{ else }}
 ---
 apiVersion: v1
@@ -19,10 +18,37 @@ spec:
   {{- toYaml $component.serviceSpec | nindent 2 }}
 {{- else }}
   ports:
-  {{- range $component.ports }}
+  {{- if eq $component.name "smbservice" }}
+    {{- if $.Values.smb }}
+      {{- if and ($.Values.smb.dataPorts) ($.Values.smb.dataPorts.start) ($.Values.smb.dataPorts.end) }}
+        {{- $start := int ($.Values.smb.dataPorts.start) }}
+        {{- $end := int ($.Values.smb.dataPorts.end) }}
+        {{- $count := sub $end $start | add1 }}
+        {{- range $i := until (int $count) }}
+        {{- $port := add $start $i }}
+    - name: {{ printf "data-%d" $port | quote }}
+      port: {{ $port }}
+      targetPort: {{ $port }}
+        {{- end }}
+      {{- end }}
+      {{- if and ($.Values.smb.healthPorts) ($.Values.smb.healthPorts.start) ($.Values.smb.healthPorts.end) }}
+        {{- $start := int ($.Values.smb.healthPorts.start) }}
+        {{- $end := int ($.Values.smb.healthPorts.end) }}
+        {{- $count := sub $end $start | add1 }}
+        {{- range $i := until (int $count) }}
+        {{- $port := add $start $i }}
+    - name: {{ printf "health-%d" $port | quote }}
+      port: {{ $port }}
+      targetPort: {{ $port }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+  {{- else }}
+    {{- range $component.ports }}
     - name: {{ .port | quote }}
       port: {{ .port }}
       targetPort: {{ .port }}
+    {{- end }}
   {{- end }}
   {{- if $component.service_type }}
   type: {{ $component.service_type }}
@@ -36,7 +62,5 @@ spec:
 status:
   loadBalancer: {}
 {{ end }}
-
 {{ end }}
-
 {{ end }}

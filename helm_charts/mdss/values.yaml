@@ -195,6 +195,14 @@ hpa:
   maxReplicas: 3
   cpuTargetUtilization: 85
 
+smb:
+  dataPorts:
+    start: 6002
+    end: 6006
+  healthPorts:
+    start: 7002
+    end: 7006
+
 # Available storage providers:
 # - minikube-hostpath: Local storage on the current node using the minikube provisioner
 # - no-provisioner: WIP, Local storage using static Volumes
@@ -761,6 +769,18 @@ mdss_components:
         ephemeral-storage: "0.5Gi"
   
   smbservice:
+    initContainers:
+    - name: disable-ipv6
+      image: busybox
+      securityContext:
+        privileged: true  
+      command: ["/bin/sh", "-c"]
+      args: # By default, the gRPC module in python binds the address to ipv6 address, we need to disable it in order to bind it to ipv4
+        - |
+          echo "Disabling IPv6 for this pod"
+          echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6
+          echo 1 > /proc/sys/net/ipv6/conf/default/disable_ipv6
+          echo "precedence ::ffff:0:0/96 100" >> /etc/gai.conf
     name: smbservice
     module_name: smb
     custom_repo: true
