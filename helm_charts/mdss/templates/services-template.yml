@@ -1,4 +1,3 @@
-# Create a service for each component in MDSS it has exposed ports
 {{ range $component_name, $component := .Values.mdss_components }}
 {{ if and $component.ports ( or (not $component.module_name) (contains (print $component.module_name) (index $.Values "mdss-common-environment").ENABLED_MODULES)) }}
 
@@ -19,29 +18,18 @@ spec:
 {{- else }}
   ports:
   {{- if eq $component.name "smbservice" }}
-    {{- if $.Values.smb }}
-      {{- if and ($.Values.smb.dataPorts) ($.Values.smb.dataPorts.start) ($.Values.smb.dataPorts.end) }}
-        {{- $start := int ($.Values.smb.dataPorts.start) }}
-        {{- $end := int ($.Values.smb.dataPorts.end) }}
-        {{- $count := sub $end $start | add1 }}
-        {{- range $i := until (int $count) }}
-        {{- $port := add $start $i }}
+    {{- $smbPort := int (index $.Values "mdss-common-environment").SMBSERVICE_PORT }}
+    {{- range $i := until 5 }}
+    {{- $port := add $smbPort $i }}
     - name: {{ printf "data-%d" $port | quote }}
       port: {{ $port }}
       targetPort: {{ $port }}
-        {{- end }}
-      {{- end }}
-      {{- if and ($.Values.smb.healthPorts) ($.Values.smb.healthPorts.start) ($.Values.smb.healthPorts.end) }}
-        {{- $start := int ($.Values.smb.healthPorts.start) }}
-        {{- $end := int ($.Values.smb.healthPorts.end) }}
-        {{- $count := sub $end $start | add1 }}
-        {{- range $i := until (int $count) }}
-        {{- $port := add $start $i }}
+    {{- end }}
+    {{- range $i := until 5 }}
+    {{- $port :=  add (add $smbPort 1000) $i }}
     - name: {{ printf "health-%d" $port | quote }}
       port: {{ $port }}
       targetPort: {{ $port }}
-        {{- end }}
-      {{- end }}
     {{- end }}
   {{- else }}
     {{- range $component.ports }}
