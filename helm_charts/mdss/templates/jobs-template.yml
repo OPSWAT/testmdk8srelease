@@ -13,7 +13,10 @@ spec:
     spec:
       containers:
         - name: auto-onboarding
-          image: {{ printf "%s/mdcloudservices_auto-onboarding:%s" $.Values.mdss_docker_repo $.Values.BRANCH | quote }}
+          image: {{ printf "%s/mdcloudservices_auto-onboarding:%s" $.Values.mdss_docker_repo (index $.Values "mdss-common-environment").BRANCH | quote }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - chmod +x /wait-for-it.sh && /wait-for-it.sh ${WEBCLIENT_HOST}:80 -s -t 180 -- /auto-onboarding.sh ${WEBCLIENT_HOST} ${WEBCLIENT_SERVICE_PORT_80} ${USER_NAME} ${USER_PASSWORD} ${USER_EMAIL} ${USER_FULL_NAME} ${ONBOARDING_CONFIG_FILE_NAME}
           envFrom:
             - configMapRef:
                 name: {{ $.Values.mdss_config_map_env_name | quote }}
@@ -24,7 +27,7 @@ spec:
               value: mdss-config.json
           volumeMounts:
             - name: mdss-import-config
-              mountPath: /onboarding_settings/mdss-config.json
+              mountPath: /mdss-config.json
               subPath: mdss-config.json
       restartPolicy: OnFailure
       {{- if $.Values.imagePullSecrets }}
