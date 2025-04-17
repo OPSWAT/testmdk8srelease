@@ -14,9 +14,44 @@ spec:
       containers:
         - name: auto-onboarding
           image: {{ printf "%s/mdcloudservices_auto-onboarding:%s" $.Values.mdss_docker_repo (index $.Values "mdss-common-environment").BRANCH | quote }}
-          command: ["/bin/sh", "-c"]
+          command: ["/bin/bash", "-c"]
           args:
-            - chmod +x /wait-for-it.sh && /wait-for-it.sh ${WEBCLIENT_HOST}:80 -s -t 180 -- /auto-onboarding.sh ${WEBCLIENT_HOST} ${WEBCLIENT_SERVICE_PORT_80} ${USER_NAME} ${USER_PASSWORD} ${USER_EMAIL} ${USER_FULL_NAME} ${ONBOARDING_CONFIG_FILE_NAME}
+            - |
+              # Register user
+              echo "Starting auto onboarding process..."
+              curl --location --request POST "${WEBCLIENT_HOST}:${WEBCLIENT_SERVICE_PORT_80}/api/user/register" \
+              --header "Content-Type: application/json" \
+              --data-raw "{\"userName\": \"${USER_NAME}\", \"password\": \"${USER_PASSWORD}\", \"email\": \"${USER_EMAIL}\", \"fullName\": \"${USER_FULL_NAME}\"}"
+
+              # First authenticate and extract the token
+              RESPONSE=$(curl --location --request POST "${WEBCLIENT_HOST}:${WEBCLIENT_SERVICE_PORT_80}/api/user/authenticate" \
+                --header 'Content-Type: application/json' \
+                --data-raw "{\"userName\": \"${USER_NAME}\", \"password\": \"${USER_PASSWORD}\"}" \
+                -s -w "\n%{http_code}")
+
+              HTTP_CODE=$(tail -n1 <<< "$RESPONSE")
+              BODY=$(sed '$ d' <<< "$RESPONSE")
+
+              # Extract access token
+              ACCESS_TOKEN=$(echo $BODY | jq -r '.accessToken')
+              
+              curl -v --request POST \
+              --url "http://${WEBCLIENT_HOST}:${WEBCLIENT_SERVICE_PORT_80}/api/onboarding/eula" \
+              --header "Authorization: Bearer ${ACCESS_TOKEN}" \
+              --data '{}'
+
+              # Then use the token to import configuration
+              curl --location --request POST "${WEBCLIENT_HOST}:${WEBCLIENT_SERVICE_PORT_80}/api/Configuration/import" \
+              --header "Authorization: Bearer ${ACCESS_TOKEN}" \
+              --form "ConfigurationFile=@/${ONBOARDING_CONFIG_FILE_NAME}" \
+              -s -w "\n%{http_code}"
+
+              curl -v --request POST \
+              --url "http://${WEBCLIENT_HOST}:${WEBCLIENT_SERVICE_PORT_80}/api/onboarding" \
+              --header "Authorization: Bearer ${ACCESS_TOKEN}" \
+              --data '{}'
+
+              echo "Auto onboarding completed"
           envFrom:
             - configMapRef:
                 name: {{ $.Values.mdss_config_map_env_name | quote }}
