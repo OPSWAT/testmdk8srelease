@@ -326,7 +326,7 @@ mdss_components:
   
   redis:
     name: redis
-    image: redis:7.4.1-alpine
+    image: ghcr.io/microsoft/garnet-alpine:1.0.62
     ports:
       - port: 6379
     extra_labels:
