@@ -47,8 +47,8 @@ mdss-common-environment:
 
   HTTPS_ACTIVE: "no"
   
-  BRANCH: "3.6.0"
-  BUILD_VERSION: "3.6.0.1338"
+  BRANCH: "3.6.1"
+  BUILD_VERSION: "3.6.1.1448"
 
 
   # These variables can be changed to reveal debug information in the application
