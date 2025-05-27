@@ -304,7 +304,7 @@ mdss_components:
 
   rabbitmq:
     name: rabbitmq
-    image: rabbitmq:4.0.4-management-alpine
+    image: rabbitmq:4.1.0-management-alpine
     ports:
       - port: 5672
       - port: 15672
@@ -326,7 +326,7 @@ mdss_components:
   
   redis:
     name: redis
-    image: ghcr.io/microsoft/garnet-alpine:1.0.62
+    image: ghcr.io/microsoft/garnet-alpine:1.0.66
     ports:
       - port: 6379
     extra_labels:
