@@ -1,0 +1,39 @@
+mdcore_user: "admin"
+mdcore_password: "admin"
+db_user: "postgres"
+db_password: "4Fjz92Qi7rsewckPXGhkgEpK"
+mdcore_license_key: "bmCf-7BDR-u65b-pYud-crCx-ZERv-e4TD-jBRH"
+MDCORE_REST_PORT: "8008"
+MDCORE_DB_MODE: "4"
+MDCORE_DB_TYPE: "remote"
+MDCORE_DB_HOST: "postgres-core"
+MDCORE_DB_PORT: "5432"
+MDCORE_CERT_PATH: "/cert"
+storage_provisioner: custom
+storage_name: mdcore-storage
+core_components:
+  md-core:
+    replicas: 2
+    service_type: LoadBalancer
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
+        ephemeral-storage: "5Gi"      
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+        ephemeral-storage: "10Gi"
+storage_configs:
+  pvc-example:
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: mdcore-storage
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: default
