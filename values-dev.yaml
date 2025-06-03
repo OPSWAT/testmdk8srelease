@@ -23,7 +23,7 @@ core_components:
       limits:
         memory: "1Gi"
         cpu: "500m"
-        ephemeral-storage: "10Gi"
+        ephemeral-storage: "80Gi"
 storage_configs:
   pvc-example:
     apiVersion: v1
