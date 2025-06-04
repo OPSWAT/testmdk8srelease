@@ -11,6 +11,11 @@ MDCORE_DB_PORT: "5432"
 MDCORE_CERT_PATH: "/cert"
 storage_provisioner: custom
 storage_name: mdcore-storage
+custom_storage:
+  enabled: true
+  storageName: mdcore-storage
+  storageSize: 50Gi
+  storageClassName: default
 core_components:
   md-core:
     replicas: 2
