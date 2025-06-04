@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   sources:
-    - repoURL: https://opswat.github.io/metadefender-k8s
+    - repoURL: git@bitbucket.org:metascan/metadefender-k8s.git
       targetRevision: MDK8S-237-argocd
       path: helm_charts/mdcore
       helm:
