@@ -12,7 +12,7 @@ spec:
     repoURL: git@bitbucket.org:metascan/metadefender-k8s.git
     targetRevision: MDK8S-237-argocd
     directory:
-      recurse: true
+      recurse: false
   syncPolicy:
     automated:
       selfHeal: false

@@ -11,7 +11,7 @@ spec:
       chart: metadefender_core
       helm:
         valueFiles:
-          - "$values/values-dev.yaml"
+          - "$values/payoneer/values-dev.yaml"
     - ref: values
       repoURL: git@bitbucket.org:metascan/metadefender-k8s.git
       targetRevision: MDK8S-237-argocd
