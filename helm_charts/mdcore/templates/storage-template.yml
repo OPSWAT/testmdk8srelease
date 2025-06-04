@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: $.Values.custom_storage.storageName
+  name: {{ $.Values.custom_storage.storageName }}
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: $.Values.custom_storage.storageSize
-  storageClassName: $.Values.custom_storage.storageClassName
+      storage: {{ $.Values.custom_storage.storageSize }}
+  storageClassName: {{ $.Values.custom_storage.storageClassName }}
