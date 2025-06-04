@@ -1,3 +1,15 @@
+{{ if $.Values.storage_configs }}
+
+{{ range $storage_name, $storage_value := .Values.storage_configs }}
+---
+{{- toYaml $storage_value }}
+
+{{ end }}
+
+{{ end }}
+
+{{ if $.Values.custom_storage.enabled | default false }}
+
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -9,3 +21,5 @@ spec:
     requests:
       storage: {{ $.Values.custom_storage.storageSize }}
   storageClassName: {{ $.Values.custom_storage.storageClassName }}
+
+{{ end }}

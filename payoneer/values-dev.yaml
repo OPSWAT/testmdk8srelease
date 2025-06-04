@@ -20,12 +20,3 @@ core_components:
   md-core:
     replicas: 2
     service_type: LoadBalancer
-    resources:
-      requests:
-        memory: "512Mi"
-        cpu: "250m"
-        ephemeral-storage: "5Gi"      
-      limits:
-        memory: "1Gi"
-        cpu: "500m"
-        ephemeral-storage: "80Gi"
