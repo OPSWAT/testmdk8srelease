@@ -1,9 +1,11 @@
-{{ if $.Values.storage_configs }}
-
-{{ range $storage_name, $storage_value := .Values.storage_configs }}
----
-{{- toYaml $storage_value }}
-
-{{ end }}
-
-{{ end }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mdcore-storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: default
