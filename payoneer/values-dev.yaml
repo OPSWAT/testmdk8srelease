@@ -24,16 +24,3 @@ core_components:
         memory: "1Gi"
         cpu: "500m"
         ephemeral-storage: "80Gi"
-storage_configs:
-  pvc-example:
-    apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-      name: mdcore-storage
-    spec:
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 1Gi
-      storageClassName: default
