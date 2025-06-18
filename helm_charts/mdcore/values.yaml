@@ -83,7 +83,6 @@ pvc:
   name: metadefender-pvc                             # The name of the PVC.
   labels:                                       # Key-value pairs for categorizing and selecting resources.
     app: my-app
-    storage: test
   annotations:
     #volume.beta.kubernetes.io/storage-class: "standard" #Additional metadata; for example, specifying the storage class. (deprecated it is just an example)
   accessModes:                        # Specifies the desired access modes for the volume. (Common modes ReadWriteOnce, ReadOnlyMany and ReadWriteMany)
