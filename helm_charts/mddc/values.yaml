@@ -19,6 +19,7 @@ env:
   encryption_key: "12345678123456781234567812345678"
   license_key: "bmCf-7BDR-u65b-pYud-crCx-ZERv-e4TD-jBRH"
   
+  
 # Generate secrets in Kubernetes Cluster for MetaDefender Distributed Cluster username, password, postgres user and password. Set to false in case of inputing the secrets from external secrets
 mddc_generate_secrets: true
 
@@ -75,12 +76,6 @@ storage_provisioner: hostPath
 storage_name: hostPath
 storage_node: minikube
 hostPathPrefix: mddc-storage-<APP_NAMESPACE>         # This is the absolute path on the node where to keep the database filesystem for persistance, <APP_NAMESPACE> is replaced with the current deployment namespace
-
-
-# Set to true to deploy with HorizontalPodAutoscaling
-
-
-
 
 # Ingresses settings for mddc
 
@@ -173,7 +168,7 @@ mddc_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.5Gi"
+        memory: "1Gi"
         cpu: "0.5"
   
   redis:
@@ -185,14 +180,13 @@ mddc_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.125Gi"
-        cpu: "0.100"
-        ephemeral-storage: "0.2Gi"
+        memory: "1Gi"
+        cpu: "0.5"
 
   identity-service:
     name: "identity-service"
     custom_repo: true
-    image: metadefender-distributed-cluster:identity-service-2.0.0-debian-12
+    image: metadefender-distributed-cluster:identity-service-2.1.0-debian-12
     ports:
       - port: 8891
     extra_labels:
@@ -201,16 +195,11 @@ mddc_components:
       requests:
         memory: "0.5Gi"
         cpu: "0.010"
-    hpa:
-      enabled: false
-      minReplicas: 2
-      maxReplicas: 3
-      cpuTargetUtilization: 85
     
   file-storage:
     name: file-storage
     custom_repo: true
-    image: metadefender-distributed-cluster:file-storage-2.0.0-debian-12
+    image: metadefender-distributed-cluster:file-storage-2.1.0-debian-12
     ports:
       - port: 8890
     extra_labels:
@@ -219,16 +208,11 @@ mddc_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.010"
-    hpa:
-      enabled: false
-      minReplicas: 2
-      maxReplicas: 3
-      cpuTargetUtilization: 85
 
   control-center:
     name: control-center
     custom_repo: true
-    image: metadefender-distributed-cluster:control-center-2.0.0-debian-12
+    image: metadefender-distributed-cluster:control-center-2.1.0-debian-12
     ports:
       - port: 8892
     extra_labels:
@@ -243,30 +227,41 @@ mddc_components:
       requests:
         memory: "2Gi"
         cpu: "0.5"
-    hpa:
-      enabled: false
-      minReplicas: 2
-      maxReplicas: 3
-      cpuTargetUtilization: 85
     initContainers:
-      - name: check-db-ready
-        image: opswat/metadefender-distributed-cluster:control-center-2.0.0-debian-12
-        imagePullPolicy: IfNotPresent
-        envFrom:
-          - configMapRef:
-              name: control-center
-        command: ["sh", "-c", "echo 'Delaying startup for 60s'; sleep 60"]
+    - name: wait-for-services
+      image: busybox:latest
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          echo "Waiting for identity-service:8891..."
+          until nc -vz identity-service 8891; do
+            echo "$(date) Still waiting for identity-service:8891"
+            sleep 2
+          done
+          echo "identity-service:8891 is up!"
+          echo "Waiting for file-storage:8890..."
+          until nc -vz file-storage 8890; do
+            echo "$(date) Still waiting for file-storage:8890"
+            sleep 2
+          done
+          echo "file-storage:8890 is up!"
 
 
   worker-api-gateway:
     name: worker-api-gateway
     custom_repo: true
-    image: metadefender-distributed-cluster:worker-api-gateway-2.0.0-debian-12
+    image: metadefender-distributed-cluster:worker-api-gateway-2.1.0-debian-12
     ports:
       - port: 8893
       - port: 8899
     extra_labels:
       aws-type: fargate
+    service_type: LoadBalancer
+    sessionAffinity: ClientIP
+    service_annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: external
+      service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+      service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing  
     resources:
       requests:
         memory: "0.5Gi"
@@ -277,23 +272,26 @@ mddc_components:
       maxReplicas: 3
       cpuTargetUtilization: 85
     initContainers:
-      - name: check-db-ready
-        image: opswat/metadefender-distributed-cluster:worker-api-gateway-2.0.0-debian-12
-        imagePullPolicy: IfNotPresent
-        envFrom:
-          - configMapRef:
-              name: worker-api-gateway
-        command: ["sh", "-c", "echo 'Delaying startup for 60s'; sleep 90"]
+    - name: wait-for-services
+      image: busybox:latest
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          echo "Waiting for control-center:8892..."
+          until nc -vz control-center 8892; do
+            echo "$(date) Still waiting for control-center:8892"
+            sleep 3
+          done
+          echo "control-center:8892 is up!"
 
 
 
   worker-core:
     name: worker-core
     custom_repo: true
-    image: metadefender-distributed-cluster:worker-core-2.0.0-debian-12
+    image: metadefender-distributed-cluster:worker-core-2.1.0-debian-12
     ports:
       - port: 8893
-      - port: 8008
     extra_labels:
       aws-type: fargate
     resources:
@@ -307,10 +305,14 @@ mddc_components:
       maxReplicas: 3
       cpuTargetUtilization: 85
     initContainers:
-      - name: check-db-ready
-        image: opswat/metadefender-distributed-cluster:worker-core-2.0.0-debian-12
-        imagePullPolicy: IfNotPresent
-        envFrom:
-          - configMapRef:
-              name: worker-core
-        command: ["sh", "-c", "echo 'Delaying startup for 60s'; sleep 90"]
+    - name: wait-for-services
+      image: busybox:latest
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          echo "Waiting for control-center:8892..."
+          until nc -vz control-center 8892; do
+            echo "$(date) Still waiting for control-center:8892"
+            sleep 3
+          done
+          echo "control-center:8892 is up!"
