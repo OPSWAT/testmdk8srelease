@@ -1,7 +1,7 @@
 # Create a deployment for each component in MD Core if it's enabled
 
 {{ range $component_name, $component := .Values.core_components }}
-{{ if and (or $.Values.deploy_with_core_db (not $component.is_db)) ( or (not $component.module_name) (contains (print $component.module_name) $.Values.ENABLED_MODULES)) }}
+{{ if or $.Values.deploy_with_core_db (not $component.is_db) }}
 ---
 apiVersion: apps/v1
 kind: Deployment
