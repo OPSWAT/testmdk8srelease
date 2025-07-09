@@ -57,9 +57,68 @@ deploy_with_core_db: true           # Enable or disable the local in-cluster Pos
 
 
 ############# STORAGE CONFIGURATION ##################
-### There are two ways to configure it that can be interchangables. The PVC to use is selected with storage_name ###
-### 1. Using the storage_configs where the whole PVC kind is injected to the template ###
-### 2. Using PVC section with specific variables to inject to the storage template ###
+### There are three ways to configure it that can be interchangables. The PVC to use is selected with storage_name added to the component under core_components section ###
+### 1. Using PVC section with specific variables to inject to the storage template a single PVC ###
+### 2. Using PVC as List with specific variables to inject to the storage template multiple PVCs ###
+### 3. Using the storage_configs where the whole PVC kind is injected to the template (for a single PVC)   ###
+ 
+pvc:
+  enabled: true
+  name: postgres-core                             # The name of the PVC.
+  labels:                                       # Key-value pairs for categorizing and selecting resources.
+    app: my-app
+  annotations:
+    #volume.beta.kubernetes.io/storage-class: "standard" #Additional metadata; for example, specifying the storage class. (deprecated it is just an example)
+  accessModes:                        # Specifies the desired access modes for the volume. (Common modes ReadWriteOnce, ReadOnlyMany and ReadWriteMany)
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi              # The amount of storage requested.
+  storageClassName: gp2    # The name of the StorageClass to use for dynamic provisioning. If omitted, the default StorageClass is used.
+  volumeMode: Filesystem        # Defines whether the volume is presented as a filesystem (Filesystem) or a raw block device (Block).
+  #selector:                     # A label query over volumes to consider for binding. Useful for static provisioning.
+  #  matchLabels:
+  #    type: local         
+  #volumeName: example-pv        #  Specifies the name of an existing PersistentVolume to bind to. This is typically used in static provisioning scenarios.
+
+
+### PVC supports list to create multiple PVCs
+#pvc:
+#  - name: metadefendercore-pvc  # The name of the PVC.
+#    enabled: true                       
+#    labels:                                       # Key-value pairs for categorizing and selecting resources.
+#      app: mdcore-opswat
+#    annotations:
+#      #volume.beta.kubernetes.io/storage-class: "standard" #Additional metadata; for example, specifying the storage class. (deprecated it is just an example)
+#    accessModes:                        # Specifies the desired access modes for the volume. (Common modes ReadWriteOnce, ReadOnlyMany and ReadWriteMany)
+#      - ReadWriteOnce
+#    resources:
+#      requests:
+#        storage: 50Gi              # The amount of storage requested.
+#    storageClassName: gp2    # The name of the StorageClass to use for dynamic provisioning. If omitted, the default StorageClass is used.
+#    volumeMode: Filesystem        # Defines whether the volume is presented as a filesystem (Filesystem) or a raw block device (Block).
+#    #selector:                     # A label query over volumes to consider for binding. Useful for static provisioning.
+#    #  matchLabels:
+#    #    type: local         
+#    #volumeName: example-pv        #  Specifies the name of an existing PersistentVolume to bind to. This is typically used in static provisioning scenarios.
+#  - name: postgres-pvc  # The name of the PVC.
+#    enabled: false                       
+#    labels:                                       # Key-value pairs for categorizing and selecting resources.
+#      app: mdcore-opswat
+#    annotations:
+#      #volume.beta.kubernetes.io/storage-class: "standard" #Additional metadata; for example, specifying the storage class. (deprecated it is just an example)
+#    accessModes:                        # Specifies the desired access modes for the volume. (Common modes ReadWriteOnce, ReadOnlyMany and ReadWriteMany)
+#      - ReadWriteOnce
+#    resources:
+#      requests:
+#        storage: 100Gi              # The amount of storage requested.
+#    storageClassName: gp2    # The name of the StorageClass to use for dynamic provisioning. If omitted, the default StorageClass is used.
+#    volumeMode: Filesystem        # Defines whether the volume is presented as a filesystem (Filesystem) or a raw block device (Block).
+#    #selector:                     # A label query over volumes to consider for binding. Useful for static provisioning.
+#    #  matchLabels:
+#    #    type: local         
+#    #volumeName: example-pv        #  Specifies the name of an existing PersistentVolume to bind to. This is typically used in static provisioning scenarios.
+
 
 storage_configs: null        # Custom storage yaml, set to null for ephemeral or hostPath storage
 # storage_configs:              # Example using a PVC with dynamic provisioning from an existing storage class
@@ -76,27 +135,6 @@ storage_configs: null        # Custom storage yaml, set to null for ephemeral or
 #           storage: 1Gi
 #       storageClassName: <SET_STORAGE_CLASS_NAME>
 
-pvc:
-  enabled: false
-  name: metadefender-pvc                             # The name of the PVC.
-  labels:                                       # Key-value pairs for categorizing and selecting resources.
-    app: my-app
-  annotations:
-    #volume.beta.kubernetes.io/storage-class: "standard" #Additional metadata; for example, specifying the storage class. (deprecated it is just an example)
-  accessModes:                        # Specifies the desired access modes for the volume. (Common modes ReadWriteOnce, ReadOnlyMany and ReadWriteMany)
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 100Gi              # The amount of storage requested.
-  storageClassName: default    # The name of the StorageClass to use for dynamic provisioning. If omitted, the default StorageClass is used.
-  volumeMode: Filesystem        # Defines whether the volume is presented as a filesystem (Filesystem) or a raw block device (Block).
-  #selector:                     # A label query over volumes to consider for binding. Useful for static provisioning.
-  #  matchLabels:
-  #    type: local         
-  #volumeName: example-pv        #  Specifies the name of an existing PersistentVolume to bind to. This is typically used in static provisioning scenarios.
-
-
-
 # Generate secrets for MD Core username, password, postgres user and password
 mdcore_generate_secrets: true
 
@@ -107,8 +145,8 @@ storage_provisioner: hostPath       # Type of storage to use in the pod definiti
 storage_name: pvc-name              # Name of the PVC to use in the pod definition
 hostPathPrefix: mdcore-storage-<APP_NAMESPACE>      # The absolute path on the node where to keep the database filesystem for persistance
 
-
-# Ingress setting for md core (md core setting are ignored if deploy_with_core is false)
+### Ingress Configuration
+### 1. Using core_ingress section with specific variables to inject to the ingress template (a single ingress) ###
 core_ingress:
   host: <APP_NAMESPACE>-mdcore.k8s       # Hostname for the publicly accessible ingress, the `<APP_NAMESPACE>` string will be replaced with the namespace where the chart is deployed
   service: md-core                  # Service name where the ingress should route to, this should be left unchanged
@@ -196,12 +234,13 @@ core_components:
       - port: 5432
     is_db: true
     persistentDir: /var/lib/postgresql/data
+    storage_name: postgres-core
     tls:
       enabled: false
 
   md-core:
     name: md-core
-    image: opswat/metadefendercore-debian:5.14.2        # Overrides the default docker image for the MD Core service, this value can be changed if you want to set a different version of MD Core
+    image: opswat/metadefendercore-debian:5.15.0        # Overrides the default docker image for the MD Core service, this value can be changed if you want to set a different version of MD Core
     replicas: 1                                         # Sets the number of replicas if you want to have multiple MD Core instances
     env:
       - name: MD_USER
@@ -296,7 +335,7 @@ core_components:
         maxSurge: 0
     initContainers:
       - name: check-db-ready
-        image: opswat/metadefendercore-debian:5.14.2
+        image: opswat/metadefendercore-debian:5.15.0
         imagePullPolicy: IfNotPresent
         envFrom:
           - configMapRef:

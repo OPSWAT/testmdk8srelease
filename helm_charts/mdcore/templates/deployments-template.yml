@@ -143,7 +143,11 @@ spec:
         {{ else }}
         - name: {{ $component.name }}
           persistentVolumeClaim:
+            {{- if $component.storage_name }}
+            claimName: {{ printf "%s" $component.storage_name }}
+            {{ else }}
             claimName: {{ printf "%s" $.Values.storage_name }}
+            {{ end }}
         {{ end }}
         {{ end }}
         {{- if $component.extraVolumes -}}
