@@ -74,7 +74,7 @@ pvc:
   resources:
     requests:
       storage: 100Gi              # The amount of storage requested.
-  storageClassName: gp2    # The name of the StorageClass to use for dynamic provisioning. If omitted, the default StorageClass is used.
+  storageClassName: default    # The name of the StorageClass to use for dynamic provisioning. If omitted, the default StorageClass is used.
   volumeMode: Filesystem        # Defines whether the volume is presented as a filesystem (Filesystem) or a raw block device (Block).
   #selector:                     # A label query over volumes to consider for binding. Useful for static provisioning.
   #  matchLabels:
