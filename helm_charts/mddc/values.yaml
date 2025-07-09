@@ -201,7 +201,7 @@ mddc_components:
         cpu: "0.5"
 
   identity-service:
-    name: "identity-service"
+    name: identity-service
     custom_repo: true
     image: metadefender-distributed-cluster:identity-service-2.1.0-debian-12
     ports:
