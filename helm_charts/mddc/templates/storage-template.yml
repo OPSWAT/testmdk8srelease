@@ -8,40 +8,42 @@
 
 {{ end }}
 
-{{ if $.Values.pvc.enabled }}
 
+{{- range $i, $pvc := .Values.pvcList }}
+
+{{ if $pvc.enabled }}
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Values.pvc.name }}
+  name: {{ $pvc.name | quote }}
   labels:
-    {{- range $key, $value := .Values.pvc.labels }}
-    {{ $key }}: {{ $value | quote }}
+    {{- range $k, $v := $pvc.labels }}
+    {{ $k }}: {{ $v | quote }}
     {{- end }}
   annotations:
-    {{- range $key, $value := .Values.pvc.annotations }}
-    {{ $key }}: {{ $value | quote }}
+    {{- range $k, $v := $pvc.annotations }}
+    {{ $k }}: {{ $v | quote }}
     {{- end }}
 spec:
   accessModes:
-    {{- range .Values.pvc.accessModes }}
-    - {{ . | quote }}
+    {{- range $mode := $pvc.accessModes }}
+    - {{ $mode | quote }}
     {{- end }}
   resources:
     requests:
-      storage: {{ .Values.pvc.resources.requests.storage }}
-  storageClassName: {{ .Values.pvc.storageClassName | quote }}
-  volumeMode: {{ .Values.pvc.volumeMode | quote }}
-  {{- if .Values.pvc.selector }}
+      storage: {{ $pvc.resources.requests.storage | quote }}
+  storageClassName: {{ $pvc.storageClassName | quote }}
+  volumeMode: {{ $pvc.volumeMode | quote }}
+  {{- if $pvc.selector }}
   selector:
     matchLabels:
-      {{- range $key, $value := .Values.pvc.selector.matchLabels }}
-      {{ $key }}: {{ $value | quote }}
+      {{- range $k, $v := $pvc.selector.matchLabels }}
+      {{ $k }}: {{ $v | quote }}
       {{- end }}
   {{- end }}
-  {{- if .Values.pvc.volumeName }}
-  volumeName: {{ .Values.pvc.volumeName | quote }}
+  {{- if $pvc.volumeName }}
+  volumeName: {{ $pvc.volumeName | quote }}
   {{- end }}
-
-
 {{ end }}
+{{- end }}

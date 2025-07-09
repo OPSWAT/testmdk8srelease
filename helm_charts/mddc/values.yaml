@@ -1,23 +1,23 @@
 # Default values for mddc. These will also be included in the environment of each mddc container
 env: 
-  user: "pablo"
-  password: "pablo"
-  apikey: "9f54e1b62d19a889d718cb3d9db145a4b8bb"
-  email: "admin@local"
+  user: "<MDDC_USER>"
+  password: "<MDDC_PASSWORD>"
+  apikey: null
+  email: "<MDDC_EMAIL>"
   rabbitmq_host: "rabbitmq"
   rabbitmq_port: "5672"
-  rabbitmq_user: "admin"
-  rabbitmq_password: "admin"
+  rabbitmq_user: "<RABBITMQ_DEFAULT_USER>"
+  rabbitmq_password: "<RABBITMQ_DEFAULT_PASS>"
   redis_host: "redis"
   redis_port: "6379"
   postgresql_host: postgres
   postgresql_port: "5432"
-  postgresql_user: "admin"
-  postgresql_password: "admin"
-  LOG_LEVEL: "info"
-  connection_key: "1234abcd"
-  encryption_key: "12345678123456781234567812345678"
-  license_key: "bmCf-7BDR-u65b-pYud-crCx-ZERv-e4TD-jBRH"
+  postgresql_user: "<POSTGRES_USER>"
+  postgresql_password: "<POSTGRES_PASSWORD>"
+  LOG_LEVEL: "debug"
+  connection_key: "<MDDC_CONNCETION_KEY>"
+  encryption_key: "<MDDC_ENCRYPTION_KEY>"
+  license_key: "<LICENSE_KEY>"
   
   
 # Generate secrets in Kubernetes Cluster for MetaDefender Distributed Cluster username, password, postgres user and password. Set to false in case of inputing the secrets from external secrets
@@ -32,8 +32,44 @@ persistance_enabled: true
 
 ############# STORAGE CONFIGURATION ##################
 ### There are two ways to configure the storage that can be interchangable. The PVC to use is selected with storage_name ###
-### 1. Using the storage_configs where the whole PVC kind is injected to the template ###
-### 2. Using PVC section with specific variables to inject to the storage template ###
+### 1. Using PVC section with specific variables to inject to the storage template ###
+### 2. Using the storage_configs where the whole PVC kind is injected to the template ###
+
+pvcList:
+  - name: file-storage-pvc  # The name of the PVC.
+    enabled: true                       
+    labels:                                       # Key-value pairs for categorizing and selecting resources.
+      app: mddc-opswat
+    annotations:
+      #volume.beta.kubernetes.io/storage-class: "standard" #Additional metadata; for example, specifying the storage class. (deprecated it is just an example)
+    accessModes:                        # Specifies the desired access modes for the volume. (Common modes ReadWriteOnce, ReadOnlyMany and ReadWriteMany)
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 50Gi              # The amount of storage requested.
+    storageClassName: gp2    # The name of the StorageClass to use for dynamic provisioning. If omitted, the default StorageClass is used.
+    volumeMode: Filesystem        # Defines whether the volume is presented as a filesystem (Filesystem) or a raw block device (Block).
+    #selector:                     # A label query over volumes to consider for binding. Useful for static provisioning.
+    #  matchLabels:
+    #    type: local         
+    #volumeName: example-pv        #  Specifies the name of an existing PersistentVolume to bind to. This is typically used in static provisioning scenarios.
+  - name: postgres-pvc  # The name of the PVC.
+    enabled: true                       
+    labels:                                       # Key-value pairs for categorizing and selecting resources.
+      app: mddc-opswat
+    annotations:
+      #volume.beta.kubernetes.io/storage-class: "standard" #Additional metadata; for example, specifying the storage class. (deprecated it is just an example)
+    accessModes:                        # Specifies the desired access modes for the volume. (Common modes ReadWriteOnce, ReadOnlyMany and ReadWriteMany)
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 100Gi              # The amount of storage requested.
+    storageClassName: gp2    # The name of the StorageClass to use for dynamic provisioning. If omitted, the default StorageClass is used.
+    volumeMode: Filesystem        # Defines whether the volume is presented as a filesystem (Filesystem) or a raw block device (Block).
+    #selector:                     # A label query over volumes to consider for binding. Useful for static provisioning.
+    #  matchLabels:
+    #    type: local         
+    #volumeName: example-pv        #  Specifies the name of an existing PersistentVolume to bind to. This is typically used in static provisioning scenarios.
 
 storage_configs: null        # Custom storage yaml, set to null for ephemeral or hostPath storage
 # storage_configs:              # Example using a PVC with dynamic provisioning from an existing storage class
@@ -50,31 +86,11 @@ storage_configs: null        # Custom storage yaml, set to null for ephemeral or
 #           storage: 1Gi
 #       storageClassName: <SET_STORAGE_CLASS_NAME>
 
-pvc:
-  enabled: false
-  name: metadefender-pvc                             # The name of the PVC.
-  labels:                                       # Key-value pairs for categorizing and selecting resources.
-    app: my-app
-  annotations:
-    #volume.beta.kubernetes.io/storage-class: "standard" #Additional metadata; for example, specifying the storage class. (deprecated it is just an example)
-  accessModes:                        # Specifies the desired access modes for the volume. (Common modes ReadWriteOnce, ReadOnlyMany and ReadWriteMany)
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 100Gi              # The amount of storage requested.
-  storageClassName: default    # The name of the StorageClass to use for dynamic provisioning. If omitted, the default StorageClass is used.
-  volumeMode: Filesystem        # Defines whether the volume is presented as a filesystem (Filesystem) or a raw block device (Block).
-  #selector:                     # A label query over volumes to consider for binding. Useful for static provisioning.
-  #  matchLabels:
-  #    type: local         
-  #volumeName: example-pv        #  Specifies the name of an existing PersistentVolume to bind to. This is typically used in static provisioning scenarios.
-
 
 # Available storage providers:
 # - hostPath
-storage_provisioner: hostPath
-storage_name: hostPath
-storage_node: minikube
+# - custom
+storage_provisioner: custom
 hostPathPrefix: mddc-storage-<APP_NAMESPACE>         # This is the absolute path on the node where to keep the database filesystem for persistance, <APP_NAMESPACE> is replaced with the current deployment namespace
 
 # Ingresses settings for mddc
@@ -144,6 +160,7 @@ mddc_components:
       - port: 5432
     is_db: true
     persistentDir: /var/lib/postgresql/data
+    storage_name: postgres-pvc
     tls:
       enabled: false
 
@@ -204,10 +221,19 @@ mddc_components:
       - port: 8890
     extra_labels:
       aws-type: fargate
+    persistentDir: /opt/opswat/mddc-file-storage
+    storage_name: file-storage-pvc
     resources:
       requests:
         memory: "0.25Gi"
         cpu: "0.010"
+    initContainers:
+        - name: volume-init
+          image: busybox
+          command: ["sh", "-c", "chmod 777 /opt/opswat/mddc-file-storage"]
+          volumeMounts:
+            - name: file-storage
+              mountPath: /opt/opswat/mddc-file-storage
 
   control-center:
     name: control-center
