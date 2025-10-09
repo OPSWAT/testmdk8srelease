@@ -55,6 +55,8 @@ mdss-common-environment:
   LICENSINGSERVICE_URL: "http://licensingservice"
   LICENSINGSERVICE_PORT: "5000"
   LICENSINGSERVICE_LISTENING_IP: "0.0.0.0"
+  PRODUCT_NAME: "MetaDefender Storage Security"
+  PRODUCT_NAME_SHORT: "MDSS"
   SMBSERVICE_URL: "http://smbservice"
   SFTPSERVICE_URL: "http://sftpservice"
   NFSSERVICE_URL: "http://nfsservice"
