@@ -67,8 +67,8 @@ mdss-common-environment:
   SFTPSERVICE_LISTENING_IP: "0.0.0.0"
   NFSSERVICE_PORT: "5004"
   NFSSERVICE_LISTENING_IP: "0.0.0.0"
+  ALLOW_SSL_CONFIGURATION_FROM_UI: "False"
   
-
   # These variables can be changed to reveal debug information in the application
   LOG_LEVEL: "4"
 
