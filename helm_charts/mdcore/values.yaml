@@ -43,9 +43,6 @@ MDCORE_DB_HOST: postgres-core       # Hostname / entrypoint of the database, thi
 MDCORE_DB_PORT: "5432"              # Port for the PostgreSQL Database
 MDCORE_CERT_PATH: "/cert"
 
-RABBITMQ_DEFAULT_USER: rabbitmq
-RABBITMQ_DEFAULT_PASS: null          # RabbitMQ broker password, if not set it will be randomly generated
-
 CERT_KEY: |
   <SET_MD_NAS_CERT_KEY>
 CERT: |
