@@ -129,50 +129,12 @@ resource "azurerm_kubernetes_cluster" "k8s" {
   }
 }
 
-resource "azurerm_cosmosdb_account" "mdcs" {
-  count  = var.deploy_cosmos_db ? 1 : 0
-  name                      = var.cosmos_db_account_name
-  location                  = azurerm_resource_group.k8s.location
-  resource_group_name       = azurerm_resource_group.k8s.name
-  offer_type                = "Standard"
-  kind                      = "MongoDB"
-  enable_automatic_failover = true
-  capabilities {
-    name = "EnableMongo"
-  }
-
-  consistency_policy {
-    consistency_level       = "BoundedStaleness"
-    max_interval_in_seconds = 400
-    max_staleness_prefix    = 200000
-  }
-
-  geo_location {
-    location          = var.failover_location
-    failover_priority = 1
-  }
-
-  geo_location {
-    location          = var.resource_group_location
-    failover_priority = 0
-  }
-
-}
-
-resource "azurerm_cosmosdb_mongo_database" "mongodb" {
-  count  = var.deploy_cosmos_db ? 1 : 0
-  name                = "MDCS"
-  resource_group_name = azurerm_cosmosdb_account.mdcs[0].resource_group_name
-  account_name        = azurerm_cosmosdb_account.mdcs[0].name
-  throughput          = 400
-}
-
 resource "azurerm_postgresql_flexible_server" "postgredb" {
   count  = var.deploy_postgres_db ? 1 : 0
   name                = "postgresql-${var.postgres_db_account_name}"
   location            = azurerm_resource_group.k8s.location
   resource_group_name = random_pet.rg-name.id
-  version             = "12"
+  version             = "17.6"
   delegated_subnet_id    = azurerm_subnet.subnet_db.id
   private_dns_zone_id    = azurerm_private_dns_zone.priv_zone.id
 
