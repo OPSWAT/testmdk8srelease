@@ -11,6 +11,7 @@ externalDB=false
 OS_ARCH=$(echo "$(uname -s|tr '[:upper:]' '[:lower:]'|sed 's/mingw64_nt.*/windows/')-$(uname -m | sed 's/x86_64/amd64/g')" | awk '{print tolower($0)}')
 MDSS="false"
 MDCORE="false"
+ICAP="false"
 namespace="default"
 replicas=1
 db_user="postgres"
@@ -43,12 +44,13 @@ privateconnection=true
 # Print the usage message
 function printHelp () {
   echo "Usage: "
-  echo "  metadefenderk8s.sh provision|install|upgrade -l|--location <location> --mdcore|--mdss [-i|--image <image_version>] [--region <region>] [--name <name>] [--namespace <namespace>] [--replicas] "
+  echo "  metadefenderk8s.sh provision|install|upgrade|destroy -l|--location <location> --mdcore|--mdss [-i|--image <image_version>] [--region <region>] [--name <name>] [--namespace <namespace>] [--replicas] "
   echo "  metadefenderk8s.sh -h|--help (print this message)"
   echo "    <mode> - one of 'provision', 'install' or 'upgrade'"
   echo "      - 'provision' - Generate resources in the CSP selected in --location"
   echo "      - 'install' - Install MD Core, use --mdss if you want to install mdss too"
   echo "      - 'upgrade'  - upgrade the MD Core version installed"
+  echo "      - 'destroy'  - destroy the environment created"
   echo "    -l <location> - Cloud Provider or Local Cluster [AWS | Azure | Local (Install only) ] - Required on provision and install mode"
   echo "    -mdss|--mdss - When flag included OPSWAT MDSS will be installed"
   echo "    -mdcore|--mdcore - When flag included on provision mode it will also install MD Core"
@@ -1140,6 +1142,35 @@ function provision () {
 function upgradeCluster() {
     echo "Upgrading Cluster from MetaDefender Script Coming Soon"
 }
+function cleanUpEnvironment() {
+    echo "Cleaning up resources uninstalling helm charts and destroying terraform resources"
+    if [ "${MDCORE}" == "true" ];then
+      echo "Uninstalling MD Core helm chart"
+      helm uninstall mdcore --namespace $namespace
+    fi
+    if [ "${MDSS}" == "true" ];then
+      echo "Uninstalling MDSS helm chart"
+      helm uninstall mdss --namespace $namespace
+    fi
+    if [ "${ICAP}" == "true" ];then
+      echo "Uninstalling ICAP helm chart"
+      helm uninstall icap --namespace $namespace
+    fi  
+    echo "Destroying infrastructure with terraform"
+    if [ "$LOCATION_PARAM" == "aws" ];then
+      cd terraform/aws/
+      terraform destroy -var-file="variables/variables.tfvars"
+    elif [ "$LOCATION_PARAM" == "azure" ];then
+      cd terraform/azure/
+    elif [ "$LOCATION_PARAM" == "gcp" ];then
+      cd terraform/gcloud/
+      terraform destroy \
+      -var="project_id=$project_id" \
+      -var="gcloud_json_key_path=$GCP_JSON_CREDENTIALS_PATH"
+
+    fi
+    
+}
 
 
 ############## Here starts the Main function #############
@@ -1152,6 +1183,8 @@ elif [ "$MODE" == "install" ]; then
   EXPMODE="Installing MD Core in K8S cluster, we will ask you for choosing between some options"
 elif [ "$MODE" == "upgrade" ]; then
   EXPMODE="Upgrading the MD Core in K8S cluster "
+elif [ "$MODE" == "destroy" ]; then
+  EXPMODE="Destroying the environment created"
 else
   printHelp
   exit 1
@@ -1168,7 +1201,7 @@ fi
       fi
       case "$opt" in
         "-l"|"--location")
-            if [ "$MODE" == "provision" ] || [ "$MODE" == "install" ]; then
+            if [ "$MODE" == "provision" ] || [ "$MODE" == "install" ] || [ "$MODE" == "destroy" ]; then
               LOCATION="$1";
               LOCATION_PARAM=$(echo $LOCATION | awk '{print tolower($0)}');
               shift
@@ -1220,6 +1253,12 @@ function checkLocation() {
         else 
           echo "Region to be used: "$region
         fi
+        # For GCP, project_id is required
+        if [ "$LOCATION_PARAM" == "gcp" ] && [ -z "$project_id" ];then
+          echo "GCP Project ID is required for GCP provisioning"
+          printHelp
+          exit 0
+        fi
   else
       if [ "${MODE}" == "provision" ];then
         # Location command is required
@@ -1227,7 +1266,7 @@ function checkLocation() {
         printHelp
         exit 0
       fi
-      if [ "${MODE}" == "install" ] && [ "${LOCATION_PARAM}" != "local" ];then
+      if [[ "${MODE}" == "install" || "${MODE}" == "destroy" ]] && [[ "${LOCATION_PARAM}" != "local" ]];then
         # Location command is required
         echo "Location parameter is required, options AWS | Azure | GCP | Local"
         printHelp
@@ -1258,21 +1297,43 @@ if [ "${MODE}" == "provision" ];then
   fi
   echo $message
 fi
+if [ "${MODE}" == "install" ];then 
+  if [ "${MDCORE}" == "true" ];then 
+        message_install="Install MD Core version '${MD_CORE_IMAGE}'";
+  fi
+  if [ "${MDSS}" == "true" ];then
+        message_install=${message_install}" with MDSS";
+  fi
+  if [ "${ICAP}" == "true" ];then
+        message_install=${message_install}" with ICAP";
+  fi
+  echo $message_install
+fi
+if [ "${MODE}" == "destroy" ];then 
+  if [ "${MDCORE}" == "true" ];then 
+        message_destroy="Destroy environment created in ${LOCATION} and uninstall MD Core version '${MD_CORE_IMAGE}'";
+  fi
+  if [ "${MDSS}" == "true" ];then
+        message_destroy=${message_destroy}" with MDSS";
+  fi
+  if [ "${ICAP}" == "true" ];then
+        message_destroy=${message_destroy}" with ICAP";
+  fi
+  echo $message_destroy
+fi
 # ask for confirmation to proceed
 askProceed
 
 #Create the MD Core service in the location selected
 if [ "${MODE}" == "provision" ]; then ## Generate Artifacts
-  if [ "$LOCATION_PARAM" == "gcp" ] && [ -z "$project_id" ];then
-      echo "GCP Project ID is required for GCP provisioning"
-      printHelp
-      exit 0
-  fi
   provision
 elif [ "${MODE}" == "install" ]; then
   install
 elif [ "${MODE}" == "upgrade" ]; then ## Upgrade the network from v1.0.x to v1.1
   upgradeCluster
+elif [ "${MODE}" == "destroy" ]; then ## Destroy the environment created
+
+  cleanUpEnvironment
 else
   printHelp
   exit 1
