@@ -14,7 +14,7 @@ mdss-common-environment:
 
   BRANCH: "4.1.0"
   ENABLED_MODULES: "azureblob,amazonsdk,nfs"                                  # Enabled modules by default
-  # ENABLED_MODULES: "azureblob,amazonsdk,googlecloud,alibabacloud,azurefiles,smb,box,graph,onedrive,sftp,mft"             # All supported modules
+  # ENABLED_MODULES: "azureblob,amazonsdk,googlecloud,alibabacloud,azurefiles,oracle,smb,box,graph,onedrive,sftp,mft"             # All supported modules
 
   # PostgreSQL migrations Configuration
   PGMIGRATIONS_PORT: "27777"
