@@ -28,7 +28,7 @@ externalDB_mdss=false
 db_user_mdss="mdss"
 db_password_mdss=null
 db_host_mdss="postgres-mdss"
-db_port_mdss=5432
+db_port_mdss="5432"
 db_url_mdss="Host=postgres-mdss;Port=5432;Username=mdss;Password=<MDSS_DB_PASSWORD>;Database=MDSS"
 rabbit_URI_mdss="amqp://rabbitmq:5672"
 rabbit_ip_mdss="rabbitmq"
@@ -340,6 +340,8 @@ function askOwnDBMDSS () {
       read -p "PASSWORD for PostgreSQL DB: " -s db_password_mdss
       echo
       read -p "Host url for PostgreSQL DB: " db_host_mdss
+      db_url_mdss="Host="$db_host_mdss";Port=5432;Username="$db_user_mdss";Password="$db_password_mdss";Database=MDSS"
+
     ;;
     No | no )
       echo "Edit the following configmap for starting MDSS services"
@@ -656,7 +658,7 @@ function installMDCore() {
 
     if [ "$LOCATION_PARAM" == "local" ];then
 
-        helm install mdcore mdcore/ --namespace $namespace --create-namespace \
+        helm upgrade --install mdcore mdcore/ --namespace $namespace --create-namespace \
         --set core_ingress.enabled=$ingress_enabled \
         --set mdcore_license_key=$MDCORE_LICENSE_KEY \
         --set deploy_with_core_db=$k8s_db \
@@ -678,7 +680,7 @@ function installMDCore() {
           else
             ipInternal="external"
           fi
-          helm install mdcore mdcore/ --namespace $namespace --create-namespace -f $helm_file \
+          helm upgrade --install mdcore mdcore/ --namespace $namespace --create-namespace -f $helm_file \
           --set core_ingress.enabled=$ingress_enabled \
           --set mdcore_license_key=$MDCORE_LICENSE_KEY \
           --set deploy_with_core_db=$k8s_db \
@@ -695,7 +697,7 @@ function installMDCore() {
       elif [ "$LOCATION_PARAM" == "azure" ]; then
           helm_file="mdcore-azure-aks-values.yml"
 
-          helm install mdcore mdcore/ --namespace $namespace --create-namespace -f $helm_file \
+          helm upgrade --install mdcore mdcore/ --namespace $namespace --create-namespace -f $helm_file \
           --set core_ingress.enabled=$ingress_enabled \
           --set mdcore_license_key=$MDCORE_LICENSE_KEY \
           --set deploy_with_core_db=$k8s_db \
@@ -722,7 +724,7 @@ function installMDCore() {
 
           if [ "$ipInternal" == "true" ];then
 
-            helm install mdcore mdcore/ --namespace $namespace --create-namespace -f $helm_file \
+            helm upgrade --install mdcore mdcore/ --namespace $namespace --create-namespace -f $helm_file \
             --set core_ingress.enabled=$ingress_enabled \
             --set mdcore_license_key=$MDCORE_LICENSE_KEY \
             --set deploy_with_core_db=$k8s_db \
@@ -738,7 +740,7 @@ function installMDCore() {
 
           else
 
-            helm install mdcore mdcore/ --namespace $namespace --create-namespace -f $helm_file \
+            helm upgrade --install mdcore mdcore/ --namespace $namespace --create-namespace -f $helm_file \
             --set core_ingress.enabled=$ingress_enabled \
             --set mdcore_license_key=$MDCORE_LICENSE_KEY \
             --set deploy_with_core_db=$k8s_db \
@@ -787,7 +789,7 @@ function installMDSS () {
     askProceed
 
     if [ "$LOCATION_PARAM" == "local" ];then
-      helm install mdss mdss/ --namespace $namespace --create-namespace \
+      helm upgrade --install mdss mdss/ --namespace $namespace --create-namespace \
       --set mdss_ingress.enabled=$ingress_enabled
     else
       if [ "$LOCATION_PARAM" == "aws" ];then
@@ -796,6 +798,9 @@ function installMDSS () {
           helm_file="mdss-azure-aks-values.yml"
       elif [ "$LOCATION_PARAM" == "gcp" ]; then
           helm_file="mdss-gcloud-values.yml"
+          if [ "$privateconnection" == "true" ];then
+            db_host_mdss="cloud-sql-proxy"
+          fi
       fi
       if $externalRabbit_mdss ;then
         rabbit_replicas=0
@@ -809,15 +814,14 @@ function installMDSS () {
         redis_replicas=1
       fi
 
+      echo $db_url_mdss
 
-
-      helm install mdss mdss/ --namespace $namespace --create-namespace -f $helm_file \
+      helm upgrade --install mdss mdss/ --namespace $namespace --create-namespace -f $helm_file \
       --set mdss_ingress.enabled=$ingress_enabled \
       --set POSTGRESQL_URL=$db_url_mdss \
       --set MDSS_DB_USER=$db_user_mdss \
       --set MDSS_DB_PASSWORD=$db_password_mdss \
       --set MDSS_DB_HOST=$db_host_mdss \
-      --set MDSS_DB_PORT=$db_port_mdss \
       --set mdss-common-environment.RABBITMQ_URI=$rabbit_url_mdss \
       --set mdss-common-environment.RABBITMQ_HOST=$rabbit_Host_mdss \
       --set mdss-common-environment.CACHE_SERVICE_URI=$redis_uri_mdss \
@@ -843,9 +847,14 @@ function installICAP () {
     if [ "${externalDB}" == "true" ];then
       echo "Using external DB host of MetaDefender Core for ICAP"
       db_host_icap=$db_host
-    fi 
+    fi
+    if [ "$LOCATION_PARAM" == "gcp" ]; then
+      if [ "$privateconnection" == "true" ];then
+        db_host_icap="cloud-sql-proxy"
+      fi
+    fi
 
-    helm install icap icap/ --namespace $namespace --create-namespace \
+    helm upgrade --install icap icap/ --namespace $namespace --create-namespace \
     --set icap_ingress.enabled=$ingress_enabled \
     --set ACCEPT_EULA="true" \
     --set mdicapsrv_license_key=$MDICAPSRV_LICENSE_KEY \
@@ -853,7 +862,8 @@ function installICAP () {
     --set mdicapsrv_user=$mdcore_user \
     --set db_user=$db_user \
     --set db_password=$db_password \
-    --set md_icapsrv.database.db_host=$db_host_icap \
+    --set postgres_mdicapsrv=$k8s_db \
+    --set md_icapsrv.database.db_host=$db_host_icap 
     
 }
 
@@ -1017,6 +1027,7 @@ function provisionGCP() {
     echo $db_password_mdss
 
     db_url_mdss="Host="$db_host_mdss";Port=5432;Username="$username_postgres";Password="$db_password_mdss";Database=MDSS"
+    echo $db_url_mdss
 
   fi 
   
