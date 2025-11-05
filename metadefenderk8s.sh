@@ -20,11 +20,16 @@ mdcore_password=null
 rabbit_mq_port=5671
 redis_port_mdss=6379
 db_host=postgres-core
+db_host_icap=postgres-mdicapsrv
 project_id=""
 externalRabbit_mdss=false
 externalRedis_mdss=false
 externalDB_mdss=false
-db_url_mdss="mongodb://mongodb:27017/MDCS"
+db_user_mdss="mdss"
+db_password_mdss=null
+db_host_mdss="postgres-mdss"
+db_port_mdss=5432
+db_url_mdss="Host=postgres-mdss;Port=5432;Username=mdss;Password=<MDSS_DB_PASSWORD>;Database=MDSS"
 rabbit_URI_mdss="amqp://rabbitmq:5672"
 rabbit_ip_mdss="rabbitmq"
 rabbit_mq_port=5672
@@ -71,8 +76,8 @@ cloudOptions[awscluster]="EKS"
 cloudOptions[aws1]="EC2"
 cloudOptions[aws2]="Fargate"
 cloudOptions[awslb]="Network Load Balancer (LB)"
-cloudOptions[awsdb]="RDS"
-cloudOptions[awsdbmdss]="Document DB"
+cloudOptions[awsdb]="RDS for PostgreSQL"
+cloudOptions[awsdbmdss]="RDS for PostgreSQL"
 cloudOptions[awsredismdss]="AWS Elastic Cache for Redis"
 cloudOptions[awsrabbitmdss]="Amazon MQ for RabbitMQ"
 cloudOptions[awsregion]="eu-central-1"
@@ -88,7 +93,7 @@ cloudOptions[gcp1]="VMS"
 cloudOptions[gcp2]="Autopilot"
 cloudOptions[gcplb]="Private Load Balancer"
 cloudOptions[gcpdb]="Cloud SQL"
-cloudOptions[gcpdbmdss]="Mongo DB Atlas"
+cloudOptions[gcpdbmdss]="PostgreSQL in Cloud SQL"
 cloudOptions[gcpredismdss]="Memorystore for Redis"
 cloudOptions[gcpregion]="us-central1"
 
@@ -299,11 +304,11 @@ function askDBExternalMDSS () {
 
     optdb="${LOCATION_PARAM}dbmdss"
     cloudOptDBMDSS=${cloudOptions[$optdb]}
-    
-    read -p "Create a Mongo DB in K8S or create $LOCATION $cloudOptDBMDSS? [K8S/External] " ans
+
+    read -p "Create a PostgreSQL DB in K8S or create $LOCATION $cloudOptDBMDSS? [K8S/External] " ans
     case "$ans" in
         k8s | K8S )
-            echo "Mongo db service will be created in K8S"
+            echo "PostgreSQL db service will be created in K8S"
             optExtDBSelecMDCore="K8S"
             persistent_mdss=true
             externalDB_mdss=false
@@ -315,8 +320,8 @@ function askDBExternalMDSS () {
             optExtDBSelecMDSS=$cloudOptDBMDSS
             externalDB_mdss=true
             k8s_db_mdss=false
-            read -p "USERNAME for Mongo DB $LOCATION $cloudOptDBMDSS: " db_user_mdss
-            read -p "PASSWORD for Mongo DB $LOCATION $cloudOptDBMDSS: " -s db_password_mdss
+            read -p "USERNAME for PostgreSQL DB $LOCATION $cloudOptDBMDSS: " db_user_mdss
+            read -p "PASSWORD for PostgreSQL DB $LOCATION $cloudOptDBMDSS: " -s db_password_mdss
             echo
         ;;
         * )
@@ -328,17 +333,17 @@ function askDBExternalMDSS () {
 }
 
 function askOwnDBMDSS () {
-  read -p "Do you want to set credentials for MetaDefender For Secure Storage Mongo DB with this script? [Yes/No] " ans
+  read -p "Do you want to set credentials for MetaDefender For Secure Storage PostgreSQL DB with this script? [Yes/No] " ans
   case "$ans" in
     Yes | yes )
-      read -p "USERNAME for Mongo DB: " db_user_mdss
-      read -p "PASSWORD for Mongo DB: " -s db_password_mdss
+      read -p "USERNAME for PostgreSQL DB: " db_user_mdss
+      read -p "PASSWORD for PostgreSQL DB: " -s db_password_mdss
       echo
-      read -p "Host url for Mongo DB: " db_host_mdss
+      read -p "Host url for PostgreSQL DB: " db_host_mdss
     ;;
     No | no )
       echo "Edit the following configmap for starting MDSS services"
-      echo " - MONGO_URI in mdss-env configmap with the connection string"
+      echo " - POSTGRES_URI in mdss-env configmap with the connection string"
     ;;
     * )
         echo "invalid response"
@@ -348,34 +353,45 @@ function askOwnDBMDSS () {
 }
 
 function askDBMDSS () {
+  
+  if [ "$optDBSelecMDCore" == "Own" ] || [ "$optDBSelecMDCore" == "New" ];then
 
-  read -p "Do you have your own or want to create a Mongo DB? [Own/New] " ans
-  case "$ans" in
-    Own | OWN | own )
-      askOwnDBMDSS
-      optDBSelecMDSS="Own"
-      externalDB_mdss=false
-      k8s_db_mdss=false
-      privateconnection_mdss=false
-    ;;
-    new | New | NEW)
-        if [ "$LOCATION_PARAM" == "local" ] || [ "${MODE}" == "install" ];then
-          echo "We will create a mongo db pod in your cluster"
-          optExtDBSelecMDSS="K8S"
-          persistent_mdss=true
-          externalDB_mdss=false
-          k8s_db_mdss=true
-          privateconnection_mdss=false
-        else
-          askDBExternalMDSS
-        fi
-        optDBSelecMDSS="New"
-    ;;
-    * )
-      echo "invalid response"
-      askDBMDSS
-    ;;
-  esac
+    echo "Using the same database configuration as MetaDefender Core for MetaDefender For Secure Storage"
+    optDBSelecMDSS=$optDBSelecMDCore
+    externalDB_mdss=$externalDB
+    persistent_mdss=$persistent
+    k8s_db_mdss=$k8s_db
+    privateconnection_mdss=$privateconnection
+  else
+    
+    read -p "Do you have your own or want to create a PostgreSQL DB for MDSS? [Own/New] " ans
+    case "$ans" in
+      Own | OWN | own )
+        askOwnDBMDSS
+        optDBSelecMDSS="Own"
+        externalDB_mdss=false
+        k8s_db_mdss=false
+        privateconnection_mdss=false
+      ;;
+      new | New | NEW)
+          if [ "$LOCATION_PARAM" == "local" ] || [ "${MODE}" == "install" ];then
+            echo "We will create a PostgreSQL db pod in your cluster"
+            optExtDBSelecMDSS="K8S"
+            persistent_mdss=true
+            externalDB_mdss=false
+            k8s_db_mdss=true
+            privateconnection_mdss=false
+          else
+            askDBExternalMDSS
+          fi
+          optDBSelecMDSS="New"
+      ;;
+      * )
+        echo "invalid response"
+        askDBMDSS
+      ;;
+    esac
+  fi
 }
 
 function askRedisExternalMDSS () {
@@ -591,7 +607,7 @@ function install(){
       ask3rdPartyMDSS
       echo "SUMMARY OF SELECTIONS MetaDefender For Secure Storage: "
       echo " - $optAccessSelec access to the cluster"
-      echo " - $optDBSelecMDSS Mongo DB $optExtDBSelecMDSS"
+      echo " - $optDBSelecMDSS PostgreSQL DB $optExtDBSelecMDSS"
       echo " - $optRedisSelecMDSS Redis service $optExtRedisSelecMDSS"
       echo " - $optRabbitSelecMDSS Rabbit service $optExtRabbitSelecMDSS"
     fi
@@ -644,6 +660,7 @@ function installMDCore() {
         --set core_ingress.enabled=$ingress_enabled \
         --set mdcore_license_key=$MDCORE_LICENSE_KEY \
         --set deploy_with_core_db=$k8s_db \
+        --set pvc.enabled=$k8s_db \
         --set core_components.md-core.replicas=$replicas \
         --set mdcore_password=$mdcore_password \
         --set mdcore_user=$mdcore_user \
@@ -665,6 +682,7 @@ function installMDCore() {
           --set core_ingress.enabled=$ingress_enabled \
           --set mdcore_license_key=$MDCORE_LICENSE_KEY \
           --set deploy_with_core_db=$k8s_db \
+          --set pvc.enabled=$k8s_db \
           --set core_components.md-core.replicas=$replicas \
           --set mdcore_password=$mdcore_password \
           --set mdcore_user=$mdcore_user \
@@ -681,6 +699,7 @@ function installMDCore() {
           --set core_ingress.enabled=$ingress_enabled \
           --set mdcore_license_key=$MDCORE_LICENSE_KEY \
           --set deploy_with_core_db=$k8s_db \
+          --set pvc.enabled=$k8s_db \
           --set core_components.md-core.replicas=$replicas \
           --set mdcore_password=$mdcore_password \
           --set mdcore_user=$mdcore_user \
@@ -707,6 +726,7 @@ function installMDCore() {
             --set core_ingress.enabled=$ingress_enabled \
             --set mdcore_license_key=$MDCORE_LICENSE_KEY \
             --set deploy_with_core_db=$k8s_db \
+            --set pvc.enabled=$k8s_db \
             --set core_components.md-core.replicas=$replicas \
             --set mdcore_password=$mdcore_password \
             --set mdcore_user=$mdcore_user \
@@ -722,6 +742,7 @@ function installMDCore() {
             --set core_ingress.enabled=$ingress_enabled \
             --set mdcore_license_key=$MDCORE_LICENSE_KEY \
             --set deploy_with_core_db=$k8s_db \
+            --set pvc.enabled=$k8s_db \
             --set core_components.md-core.replicas=$replicas \
             --set mdcore_password=$mdcore_password \
             --set mdcore_user=$mdcore_user \
@@ -792,7 +813,11 @@ function installMDSS () {
 
       helm install mdss mdss/ --namespace $namespace --create-namespace -f $helm_file \
       --set mdss_ingress.enabled=$ingress_enabled \
-      --set mdss-common-environment.MONGO_URL=$db_url_mdss \
+      --set POSTGRESQL_URL=$db_url_mdss \
+      --set MDSS_DB_USER=$db_user_mdss \
+      --set MDSS_DB_PASSWORD=$db_password_mdss \
+      --set MDSS_DB_HOST=$db_host_mdss \
+      --set MDSS_DB_PORT=$db_port_mdss \
       --set mdss-common-environment.RABBITMQ_URI=$rabbit_url_mdss \
       --set mdss-common-environment.RABBITMQ_HOST=$rabbit_Host_mdss \
       --set mdss-common-environment.CACHE_SERVICE_URI=$redis_uri_mdss \
@@ -812,11 +837,24 @@ function installICAP () {
     else
         echo "MDICAPSRV_LICENSE_KEY found in the environment variables"
     fi
+    echo "By proceeding you agree to the OPSWAT Terms of Service: https://www.opswat.com/legal/terms-of-service"
     askProceed
+
+    if [ "${externalDB}" == "true" ];then
+      echo "Using external DB host of MetaDefender Core for ICAP"
+      db_host_icap=$db_host
+    fi 
+
     helm install icap icap/ --namespace $namespace --create-namespace \
     --set icap_ingress.enabled=$ingress_enabled \
-    --set mdicapsrv_license_key=$MDICAPSRV_LICENSE_KEY
-
+    --set ACCEPT_EULA="true" \
+    --set mdicapsrv_license_key=$MDICAPSRV_LICENSE_KEY \
+    --set mdicapsrv_password=$mdcore_password \
+    --set mdicapsrv_user=$mdcore_user \
+    --set db_user=$db_user \
+    --set db_password=$db_password \
+    --set md_icapsrv.database.db_host=$db_host_icap \
+    
 }
 
 function provisionAWS() {
@@ -836,9 +874,6 @@ function provisionAWS() {
   -var="POSTGRES_USERNAME=$db_user" \
   -var="POSTGRES_PASSWORD=$db_password" \
   -var="DEPLOY_REDIS=$externalRedis_mdss" \
-  -var="DEPLOY_MONGO_DB=$externalDB_mdss" \
-  -var="MONGO_USERNAME=$db_user_mdss" \
-  -var="MONGO_PASSWORD=$db_password_mdss" \
   -var="DEPLOY_RABBITMQ=$externalRabbit_mdss" \
   -var="MQ_USERNAME=$rabbit_user_mdss" \
   -var="MQ_PASSWORD=$rabbit_password_mdss" 
@@ -859,14 +894,9 @@ function provisionAWS() {
 
   ##3rd Parties MDSS endpoints
   if [ "${externalDB_mdss}" == "true" ];then
-    db_host_mdss=$(terraform output -raw MONGO_ENDPOINT)
-    tls_config=$(terraform output -raw TLS_MONGO_ENABLED)
-    if [ "${tls_config}" == "enabled" ];then
-      db_url_mdss="mongodb://"$db_user_mdss":"$db_password_mdss"@"$db_host_mdss":27017/MDCS?tls=true&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
-    else
-      db_url_mdss="mongodb://"$db_user_mdss":"$db_password_mdss"@"$db_host_mdss":27017/MDCS?replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
-    fi
-    echo $db_host_mdss
+    db_host_mdss=$(terraform output -raw POSTGRES_ENDPOINT)
+    db_url_mdss="Host="$db_host_mdss";Port=5432;Username="$db_user_mdss";Password="$db_password_mdss";Database=MDSS"
+    echo $db_url_mdss
   fi 
   if [ "${externalRedis_mdss}" == "true" ];then
     redis_host_mdss=$(terraform output -raw REDIS_ENDPOINT)
@@ -918,6 +948,22 @@ function provisionAzure() {
     echo $db_name
     username_postgres=$(terraform output -json db_server_username_postgres)
     echo $username_postgres
+  fi
+    ##3rd Parties MDSS endpoints
+  if [ "${externalDB_mdss}" == "true" ];then
+    db_host=$(terraform output -json db_server_fqdn_postgres)
+    echo $db_host
+    db_host_mdss=$(echo $db_host | tr -d '"')
+    echo $db_host_mdss
+    db_name=$(terraform output -json db_server_name_postgres)
+    echo $db_name
+    db_name_mdss=$(echo $db_name | tr -d '"')
+    echo $db_name_mdss
+    username_postgres=$(terraform output -json db_server_username_postgres)
+    echo $username_postgres
+    db_password_mdss=$db_password
+    db_url_mdss="Host="$db_host_mdss";Port=5432;Username="$username_postgres";Password="$db_password_mdss";Database=MDSS"
+    echo $db_url_mdss
   fi 
 
 }
@@ -928,22 +974,21 @@ function provisionGCP() {
   askProceed
 
   terraform apply \
+  -var="project_id=$project_id" \
+  -var="region=$region" \
   -var="gcloud_json_key_path=$GCP_JSON_CREDENTIALS_PATH" \
   -var="deploy_cloud_sql=$externalDB" \
-  -var="cluster_name=$cluster_name" \
+  -var="AUTOPILOT_GKE=$serverless" \
+  -var="private_ip_cloud_sql=$privateconnection" \
   -var="cloud_sql_user=$db_user" \
   -var="cloud_sql_password=$db_password" \
-  -var="private_ip_cloud_sql=$privateconnection" \
-  -var="AUTOPILOT_GKE=$serverless" \
-  -var="project_id=$project_id"
+  -var="cluster_name=$cluster_name" 
+
 
   cluster_name=$(terraform output -raw kubernetes_cluster_name)
   echo $cluster_name
-  cluster_location=$(terraform output -raw cluster_location)
+  cluster_location=$(terraform output -raw region)
   echo $cluster_location
-
-  
-
 
   
   #DB Endpoint
@@ -955,6 +1000,24 @@ function provisionGCP() {
       db_host=$(terraform output -raw cloud_sql_connection_name)
       echo $db_host
     fi
+  fi 
+
+    #DB Endpoint
+  if [ "${externalDB_mdss}" == "true" ];then
+    if [ "${privateconnection_mdss}" == "true" ];then
+      db_host_mdss=$(terraform output -raw cloud_sql_private_ip_address)
+      echo $db_host_mdss
+    else
+      db_host_mdss=$(terraform output -raw cloud_sql_connection_name)
+      echo $db_host_mdss
+    fi
+    username_postgres=$(terraform output -json cloud_sql_user)
+    echo $username_postgres
+    db_password_mdss=$(terraform output -json cloud_sql_password)
+    echo $db_password_mdss
+
+    db_url_mdss="Host="$db_host_mdss";Port=5432;Username="$username_postgres";Password="$db_password_mdss";Database=MDSS"
+
   fi 
   
 }
@@ -1012,7 +1075,7 @@ function provision () {
     echo " - $optAccessSelec access to the cluster"
     echo " - (MD Core) $optDBSelecMDCore PostgreSQL DB $optExtDBSelecMDCore"
     if [ "${MDSS}" == "true" ];then
-      echo " - (MDSS) $optDBSelecMDSS Mongo DB $optExtDBSelecMDSS"
+      echo " - (MDSS) $optDBSelecMDSS PostgreSQL DB $optExtDBSelecMDSS"
       echo " - (MDSS) $optRedisSelecMDSS Redis service $optExtRedisSelecMDSS"
       echo " - (MDSS) $optRabbitSelecMDSS Rabbit service $optExtRabbitSelecMDSS"
     fi
@@ -1165,7 +1228,7 @@ function checkLocation() {
 checkLocation
 
 #Required flags in all modes
-if [ "${MDCORE}" == "false" ] && [ "${MDSS}" == "false" ];then
+if [ "${MDCORE}" == "false" ] && [ "${MDSS}" == "false" ] && [ "${ICAP}" == "false" ];then
     echo "Product flag required in all modes"
     printHelp
     exit 0
