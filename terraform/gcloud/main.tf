@@ -32,7 +32,7 @@ resource "google_compute_subnetwork" "subnet" {
 resource "google_container_cluster" "primary-autopilot" {
   count    = var.AUTOPILOT_GKE ? 1 : 0
   name     = "mdk8s-${var.cluster_name}-gke"
-  location = var.cluster_location
+  location = var.region
   deletion_protection = false
 
   network    = google_compute_network.vpc_network.name
@@ -45,7 +45,7 @@ resource "google_container_cluster" "primary-autopilot" {
 resource "google_container_cluster" "primary" {
   count    = var.AUTOPILOT_GKE ? 0 : 1
   name     = "mdk8s-${var.cluster_name}-gke"
-  location = var.cluster_location
+  location = var.region
   deletion_protection = false
   
   remove_default_node_pool = true
@@ -59,7 +59,7 @@ resource "google_container_cluster" "primary" {
 resource "google_container_node_pool" "primary_nodes" {
   count      = var.AUTOPILOT_GKE ? 0 : 1
   name       = "${google_container_cluster.primary[0].name}-node-pool"
-  location   = var.cluster_location
+  location   = var.region
   cluster    = google_container_cluster.primary[0].name
   node_count = var.node_count
 
