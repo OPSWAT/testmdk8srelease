@@ -97,7 +97,7 @@ resource "google_service_networking_connection" "vpc_connection" {
 resource "google_sql_database_instance" "metadefender-db" {
   count  = var.deploy_cloud_sql ? 1 : 0
   name             = "metadefender-db"
-  database_version = "POSTGRES_14"
+  database_version = "POSTGRES_17"
   region           = var.region
 
   depends_on = [google_service_networking_connection.vpc_connection]
