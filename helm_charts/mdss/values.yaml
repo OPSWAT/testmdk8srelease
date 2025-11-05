@@ -68,6 +68,8 @@ mdss-common-environment:
   NFSSERVICE_PORT: "5004"
   NFSSERVICE_LISTENING_IP: "0.0.0.0"
   ALLOW_SSL_CONFIGURATION_FROM_UI: "False"
+
+  USERMANAGEMENTSERVICE_PORT: "7001"
   
   # These variables can be changed to reveal debug information in the application
   LOG_LEVEL: "4"
@@ -547,6 +549,8 @@ mdss_components:
     name: usermanagementservice
     custom_repo: true
     image: mdcloudservices_usermanagement
+    ports:
+      - port: 7001
     extra_labels:
       aws-type: fargate
     resources:
