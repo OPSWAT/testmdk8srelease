@@ -18,7 +18,6 @@ db_user="postgres"
 db_password=null
 mdcore_user="postgres"
 mdcore_password=null
-rabbit_mq_port=5671
 redis_port_mdss=6379
 db_host=postgres-core
 db_host_icap=postgres-mdicapsrv
@@ -31,7 +30,8 @@ db_password_mdss=null
 db_host_mdss="postgres-mdss"
 db_port_mdss="5432"
 db_url_mdss="Host=postgres-mdss;Port=5432;Username=mdss;Password=<MDSS_DB_PASSWORD>;Database=MDSS"
-rabbit_URI_mdss="amqp://rabbitmq:5672"
+rabbit_url_mdss="amqp://rabbitmq:5672"
+rabbit_Host_mdss="rabbitmq"
 rabbit_ip_mdss="rabbitmq"
 rabbit_mq_port=5672
 rabbit_password_mdss="guest"
@@ -44,13 +44,14 @@ privateconnection=true
 # Print the usage message
 function printHelp () {
   echo "Usage: "
-  echo "  metadefenderk8s.sh provision|install|upgrade|destroy -l|--location <location> --mdcore|--mdss [-i|--image <image_version>] [--region <region>] [--name <name>] [--namespace <namespace>] [--replicas] "
+  echo "  metadefenderk8s.sh provision|install|upgrade|destroy|uninstall -l|--location <location> --mdcore|--mdss [-i|--image <image_version>] [--region <region>] [--name <name>] [--namespace <namespace>] [--replicas] "
   echo "  metadefenderk8s.sh -h|--help (print this message)"
   echo "    <mode> - one of 'provision', 'install' or 'upgrade'"
   echo "      - 'provision' - Generate resources in the CSP selected in --location"
   echo "      - 'install' - Install MD Core, use --mdss if you want to install mdss too"
   echo "      - 'upgrade'  - upgrade the MD Core version installed"
   echo "      - 'destroy'  - destroy the environment created"
+  echo "      - 'uninstall'  - uninstall the MetaDefender products from the K8S cluster"
   echo "    -l <location> - Cloud Provider or Local Cluster [AWS | Azure | Local (Install only) ] - Required on provision and install mode"
   echo "    -mdss|--mdss - When flag included OPSWAT MDSS will be installed"
   echo "    -mdcore|--mdcore - When flag included on provision mode it will also install MD Core"
@@ -402,24 +403,30 @@ function askRedisExternalMDSS () {
 
     optdb="${LOCATION_PARAM}redismdss"
     cloudOptRedisMDSS=${cloudOptions[$optdb]}
-    
-    read -p "Create a Redis Service in K8S or create $LOCATION $cloudOptRedisMDSS? [K8S/External] " ans
-    case "$ans" in
-        k8s | K8S )
-            echo "Redis service will be created"
-            optExtRedisSelecMDSS="K8S"
-            externalRedis_mdss=false
-        ;;
-        external | External )
-            echo "Creating $LOCATION $cloudOptRedisMDSS and setting variables"
-            optExtRedisSelecMDSS=$cloudOptRedisMDSS
-            externalRedis_mdss=true
-        ;;
-        * )
-            echo "invalid response"
-            askRedisExternalMDSS
-        ;;
-    esac
+    if [ "$LOCATION_PARAM" == "aws" ];then
+      read -p "Create a Redis Service in K8S or create $LOCATION $cloudOptRedisMDSS? [K8S/External] " ans
+      case "$ans" in
+          k8s | K8S )
+              echo "Redis service will be created"
+              optExtRedisSelecMDSS="K8S"
+              externalRedis_mdss=false
+          ;;
+          external | External )
+              echo "Creating $LOCATION $cloudOptRedisMDSS and setting variables"
+              optExtRedisSelecMDSS=$cloudOptRedisMDSS
+              externalRedis_mdss=true
+          ;;
+          * )
+              echo "invalid response"
+              askRedisExternalMDSS
+          ;;
+      esac
+    else
+        ### Redis with HA only supported in AWS
+        echo "Redis service will be created in K8S"
+        optExtRedisSelecMDSS="K8S"
+        externalRedis_mdss=false
+    fi
 
 }
 
@@ -671,7 +678,7 @@ function installMDCore() {
         --set db_user=$db_user \
         --set db_password=$db_password \
         --set MDCORE_DB_HOST=$db_host \
-        --set md-core.image="opswat/metadefendercore-debian:"$MD_CORE_IMAGE
+        --set core_components.md-core.image="opswat/metadefendercore-debian:"$MD_CORE_IMAGE
 
     else
 
@@ -694,7 +701,7 @@ function installMDCore() {
           --set db_password=$db_password \
           --set MDCORE_DB_HOST=$db_host \
           --set core_components.md-core.service_annotations."service\.beta\.kubernetes\.io/aws-load-balancer-type"=$ipInternal \
-          --set md-core.image="opswat/metadefendercore-debian:"$MD_CORE_IMAGE
+          --set core_components.md-core.image="opswat/metadefendercore-debian:"$MD_CORE_IMAGE
 
       elif [ "$LOCATION_PARAM" == "azure" ]; then
           helm_file="mdcore-azure-aks-values.yml"
@@ -711,7 +718,7 @@ function installMDCore() {
           --set db_password=$db_password \
           --set MDCORE_DB_HOST=$db_host \
           --set core_components.md-core.service_annotations."service\.beta\.kubernetes\.io/azure-load-balancer-internal"="'"$ipInternal"'" \
-          --set md-core.image="opswat/metadefendercore-debian:"$MD_CORE_IMAGE 
+          --set core_components.md-core.image="opswat/metadefendercore-debian:"$MD_CORE_IMAGE
 
 
       elif [ "$LOCATION_PARAM" == "gcp" ]; then
@@ -738,7 +745,7 @@ function installMDCore() {
             --set db_password=$db_password \
             --set MDCORE_DB_HOST=$db_host \
             --set core_components.md-core.service_annotations."networking\.gke\.io/load-balancer-type"="Internal" \
-            --set md-core.image="opswat/metadefendercore-debian:"$MD_CORE_IMAGE
+            --set core_components.md-core.image="opswat/metadefendercore-debian:"$MD_CORE_IMAGE
 
           else
 
@@ -753,7 +760,7 @@ function installMDCore() {
             --set db_user=$db_user \
             --set db_password=$db_password \
             --set MDCORE_DB_HOST=$db_host \
-            --set md-core.image="opswat/metadefendercore-debian:"$MD_CORE_IMAGE
+            --set core_components.md-core.image="opswat/metadefendercore-debian:"$MD_CORE_IMAGE
 
           fi
       fi
@@ -794,19 +801,9 @@ function installMDSS () {
       helm upgrade --install mdss mdss/ --namespace $namespace --create-namespace \
       --set mdss_ingress.enabled=$ingress_enabled
     else
-      if [ "$LOCATION_PARAM" == "aws" ];then
-          helm_file="mdss-aws-eks-values.yml"
-      elif [ "$LOCATION_PARAM" == "azure" ]; then
-          helm_file="mdss-azure-aks-values.yml"
-      elif [ "$LOCATION_PARAM" == "gcp" ]; then
-          helm_file="mdss-gcloud-values.yml"
-          if [ "$privateconnection" == "true" ];then
-            db_host_mdss="cloud-sql-proxy"
-          fi
-      fi
       if $externalRabbit_mdss ;then
         rabbit_replicas=0
-        rabbit_mq_port=5671
+        rabbit_mq_port="5671"
       else
         rabbit_replicas=1
       fi
@@ -816,21 +813,94 @@ function installMDSS () {
         redis_replicas=1
       fi
 
-      echo $db_url_mdss
+      if [ "$LOCATION_PARAM" == "aws" ];then
+          helm_file="mdss-aws-eks-values.yml"
+          if [ "$ipInternal" == "true" ];then
+            ipInternal="nlb-ip"
+          else
+            ipInternal="external"
+          fi
+          helm upgrade --install mdss mdss/ \
+          --namespace $namespace \
+          --create-namespace \
+          -f $helm_file \
+          --set mdss_ingress.enabled=$ingress_enabled \
+          --set POSTGRESQL_URL=$db_url_mdss \
+          --set MDSS_DB_USER=$db_user_mdss \
+          --set MDSS_DB_PASSWORD=$db_password_mdss \
+          --set MDSS_DB_HOST=$db_host_mdss \
+          --set mdss-common-environment.RABBITMQ_URI=$rabbit_url_mdss \
+          --set mdss-common-environment.RABBITMQ_HOST=$rabbit_Host_mdss \
+          --set mdss-common-environment.CACHE_SERVICE_URI=$redis_uri_mdss \
+          --set mdss-common-environment.CACHE_SERVICE_URL=$redis_host_mdss \
+          --set mdss_components.rabbitmq.replicas=$rabbit_replicas \
+          --set mdss_components.redis.replicas=$redis_replicas \
+          --set mdss_components.webclient.service_annotations."service\.beta\.kubernetes\.io/aws-load-balancer-type"=$ipInternal \
+          --set deploy_with_mdss_db=$k8s_db_mdss 
 
-      helm upgrade --install mdss mdss/ --namespace $namespace --create-namespace -f $helm_file \
-      --set mdss_ingress.enabled=$ingress_enabled \
-      --set POSTGRESQL_URL=$db_url_mdss \
-      --set MDSS_DB_USER=$db_user_mdss \
-      --set MDSS_DB_PASSWORD=$db_password_mdss \
-      --set MDSS_DB_HOST=$db_host_mdss \
-      --set mdss-common-environment.RABBITMQ_URI=$rabbit_url_mdss \
-      --set mdss-common-environment.RABBITMQ_HOST=$rabbit_Host_mdss \
-      --set mdss-common-environment.CACHE_SERVICE_URI=$redis_uri_mdss \
-      --set mdss-common-environment.CACHE_SERVICE_URL=$redis_host_mdss \
-      --set mdss_components.rabbitmq.replicas=$rabbit_replicas \
-      --set mdss_components.redis.replicas=$redis_replicas \
-      --set deploy_with_mdss_db=$k8s_db_mdss 
+      elif [ "$LOCATION_PARAM" == "azure" ]; then
+          helm_file="mdss-azure-aks-values.yml"
+
+          helm upgrade --install mdss mdss/ \
+          --namespace $namespace \
+          --create-namespace \
+          -f $helm_file \
+          --set mdss_ingress.enabled=$ingress_enabled \
+          --set POSTGRESQL_URL=$db_url_mdss \
+          --set MDSS_DB_USER=$db_user_mdss \
+          --set MDSS_DB_PASSWORD=$db_password_mdss \
+          --set MDSS_DB_HOST=$db_host_mdss \
+          --set mdss-common-environment.RABBITMQ_URI=$rabbit_url_mdss \
+          --set mdss-common-environment.RABBITMQ_HOST=$rabbit_Host_mdss \
+          --set mdss-common-environment.CACHE_SERVICE_URI=$redis_uri_mdss \
+          --set mdss-common-environment.CACHE_SERVICE_URL=$redis_host_mdss \
+          --set mdss_components.rabbitmq.replicas=$rabbit_replicas \
+          --set mdss_components.redis.replicas=$redis_replicas \
+          --set mdss_components.webclient.service_annotations."service\.beta\.kubernetes\.io/azure-load-balancer-internal"="'"$ipInternal"'" \
+          --set deploy_with_mdss_db=$k8s_db_mdss 
+
+      elif [ "$LOCATION_PARAM" == "gcp" ]; then
+          helm_file="mdss-gcloud-values.yml"
+          if [ "$privateconnection" == "true" ];then
+            db_host_mdss="cloud-sql-proxy"
+          fi
+          if [ "$ipInternal" == "true" ];then
+            helm upgrade --install mdss mdss/ \
+              --namespace $namespace \
+              --create-namespace \
+              -f $helm_file \
+              --set mdss_ingress.enabled=$ingress_enabled \
+              --set POSTGRESQL_URL=$db_url_mdss \
+              --set MDSS_DB_USER=$db_user_mdss \
+              --set MDSS_DB_PASSWORD=$db_password_mdss \
+              --set MDSS_DB_HOST=$db_host_mdss \
+              --set mdss-common-environment.RABBITMQ_URI=$rabbit_url_mdss \
+              --set mdss-common-environment.RABBITMQ_HOST=$rabbit_Host_mdss \
+              --set mdss-common-environment.CACHE_SERVICE_URI=$redis_uri_mdss \
+              --set mdss-common-environment.CACHE_SERVICE_URL=$redis_host_mdss \
+              --set mdss_components.rabbitmq.replicas=$rabbit_replicas \
+              --set mdss_components.redis.replicas=$redis_replicas \
+              --set mdss_components.webclient.service_annotations."networking\.gke\.io/load-balancer-type"="Internal" \
+              --set deploy_with_mdss_db=$k8s_db_mdss
+          else
+            helm upgrade --install mdss mdss/ \
+            --namespace $namespace \
+            --create-namespace \
+            -f $helm_file \
+            --set mdss_ingress.enabled=$ingress_enabled \
+            --set POSTGRESQL_URL=$db_url_mdss \
+            --set MDSS_DB_USER=$db_user_mdss \
+            --set MDSS_DB_PASSWORD=$db_password_mdss \
+            --set MDSS_DB_HOST=$db_host_mdss \
+            --set mdss-common-environment.RABBITMQ_URI=$rabbit_url_mdss \
+            --set mdss-common-environment.RABBITMQ_HOST=$rabbit_Host_mdss \
+            --set mdss-common-environment.CACHE_SERVICE_URI=$redis_uri_mdss \
+            --set mdss-common-environment.CACHE_SERVICE_URL=$redis_host_mdss \
+            --set mdss_components.rabbitmq.replicas=$rabbit_replicas \
+            --set mdss_components.redis.replicas=$redis_replicas \
+            --set deploy_with_mdss_db=$k8s_db_mdss 
+          fi
+      fi
     fi
 
 }
@@ -849,6 +919,7 @@ function installICAP () {
     if [ "${externalDB}" == "true" ];then
       echo "Using external DB host of MetaDefender Core for ICAP"
       db_host_icap=$db_host
+      echo "DB Host ICAP: "$db_host_icap
     fi
     if [ "$LOCATION_PARAM" == "gcp" ]; then
       if [ "$privateconnection" == "true" ];then
@@ -864,8 +935,8 @@ function installICAP () {
     --set mdicapsrv_user=$mdcore_user \
     --set db_user=$db_user \
     --set db_password=$db_password \
-    --set postgres_mdicapsrv=$k8s_db \
-    --set md_icapsrv.database.db_host=$db_host_icap 
+    --set postgres_mdicapsrv.enabled=$k8s_db \
+    --set icap_components.md_icapsrv.database.db_host=$db_host_icap
     
 }
 
@@ -950,29 +1021,30 @@ function provisionAzure() {
   
   #DB Endpoint
   if [ "${externalDB}" == "true" ];then
-    db_host=$(terraform output -json db_server_fqdn_postgres)
-    echo $db_host
-    db_host=$(echo $db_host | tr -d '"')
-    echo $db_host
-    db_name=$(terraform output -json db_server_name_postgres)
-    echo $db_name
-    db_name=$(echo $db_name | tr -d '"')
-    echo $db_name
+    db_host_aux=$(terraform output -json db_server_fqdn_postgres)
+    echo $db_host_aux
+    db_host=$(echo $db_host_aux | tr -d '"')
+    echo "DB Host Core:"$db_host
+
+    db_name_aux=$(terraform output -json db_server_name_postgres)
+    echo $db_name_aux
+    db_name=$(echo $db_name_aux | tr -d '"')
+    echo "DB Name Core:"$db_name
     username_postgres=$(terraform output -json db_server_username_postgres)
-    echo $username_postgres
+    echo "Username DB Core:"$username_postgres
   fi
     ##3rd Parties MDSS endpoints
   if [ "${externalDB_mdss}" == "true" ];then
-    db_host=$(terraform output -json db_server_fqdn_postgres)
-    echo $db_host
-    db_host_mdss=$(echo $db_host | tr -d '"')
+    db_host_mdss_aux=$(terraform output -json db_server_fqdn_postgres)
+    echo "DB Host MDSS:"$db_host_mdss_aux
+    db_host_mdss=$(echo $db_host_mdss_aux | tr -d '"')
     echo $db_host_mdss
-    db_name=$(terraform output -json db_server_name_postgres)
-    echo $db_name
-    db_name_mdss=$(echo $db_name | tr -d '"')
+    db_name_mdss_aux=$(terraform output -json db_server_name_postgres)
+    echo "DB Name MDSS:"$db_name_mdss_aux
+    db_name_mdss=$(echo $db_name_mdss_aux | tr -d '"')
     echo $db_name_mdss
     username_postgres=$(terraform output -json db_server_username_postgres)
-    echo $username_postgres
+    echo "Username MDSS:"$username_postgres
     db_password_mdss=$db_password
     db_url_mdss="Host="$db_host_mdss";Port=5432;Username="$username_postgres";Password="$db_password_mdss";Database=MDSS"
     echo $db_url_mdss
@@ -1142,8 +1214,8 @@ function provision () {
 function upgradeCluster() {
     echo "Upgrading Cluster from MetaDefender Script Coming Soon"
 }
-function cleanUpEnvironment() {
-    echo "Cleaning up resources uninstalling helm charts and destroying terraform resources"
+function uninstall() {
+    echo "Cleaning up resources uninstalling helm charts from the K8S cluster"
     if [ "${MDCORE}" == "true" ];then
       echo "Uninstalling MD Core helm chart"
       helm uninstall mdcore --namespace $namespace
@@ -1156,12 +1228,18 @@ function cleanUpEnvironment() {
       echo "Uninstalling ICAP helm chart"
       helm uninstall icap --namespace $namespace
     fi  
+}
+function cleanUpEnvironment() {
+    
     echo "Destroying infrastructure with terraform"
     if [ "$LOCATION_PARAM" == "aws" ];then
       cd terraform/aws/
       terraform destroy -var-file="variables/variables.tfvars"
     elif [ "$LOCATION_PARAM" == "azure" ];then
       cd terraform/azure/
+      terraform destroy \
+      -var="aks_service_principal_app_id=$ARM_CLIENT_ID" \
+      -var="aks_service_principal_client_secret=$ARM_CLIENT_SECRET"
     elif [ "$LOCATION_PARAM" == "gcp" ];then
       cd terraform/gcloud/
       terraform destroy \
@@ -1185,6 +1263,8 @@ elif [ "$MODE" == "upgrade" ]; then
   EXPMODE="Upgrading the MD Core in K8S cluster "
 elif [ "$MODE" == "destroy" ]; then
   EXPMODE="Destroying the environment created"
+elif [ "$MODE" == "uninstall" ]; then
+  EXPMODE="Uninstalling MetaDefender products from K8S cluster "
 else
   printHelp
   exit 1
@@ -1201,7 +1281,7 @@ fi
       fi
       case "$opt" in
         "-l"|"--location")
-            if [ "$MODE" == "provision" ] || [ "$MODE" == "install" ] || [ "$MODE" == "destroy" ]; then
+            if [ "$MODE" == "provision" ] || [ "$MODE" == "install" ] || [ "$MODE" == "destroy" ] || [ "$MODE" == "uninstall" ]; then
               LOCATION="$1";
               LOCATION_PARAM=$(echo $LOCATION | awk '{print tolower($0)}');
               shift
@@ -1266,7 +1346,7 @@ function checkLocation() {
         printHelp
         exit 0
       fi
-      if [[ "${MODE}" == "install" || "${MODE}" == "destroy" ]] && [[ "${LOCATION_PARAM}" != "local" ]];then
+      if [[ "${MODE}" == "install" || "${MODE}" == "destroy" || "${MODE}" == "uninstall" ]] && [[ "${LOCATION_PARAM}" != "local" ]];then
         # Location command is required
         echo "Location parameter is required, options AWS | Azure | GCP | Local"
         printHelp
@@ -1321,6 +1401,18 @@ if [ "${MODE}" == "destroy" ];then
   fi
   echo $message_destroy
 fi
+if [ "${MODE}" == "uninstall" ];then 
+  if [ "${MDCORE}" == "true" ];then 
+        message_uninstall="Uninstall MD Core version '${MD_CORE_IMAGE}'";
+  fi
+  if [ "${MDSS}" == "true" ];then
+        message_uninstall=${message_uninstall}" with MDSS";
+  fi
+  if [ "${ICAP}" == "true" ];then
+        message_uninstall=${message_uninstall}" with ICAP";
+  fi
+  echo $message_uninstall
+fi
 # ask for confirmation to proceed
 askProceed
 
@@ -1332,9 +1424,12 @@ elif [ "${MODE}" == "install" ]; then
 elif [ "${MODE}" == "upgrade" ]; then ## Upgrade the network from v1.0.x to v1.1
   upgradeCluster
 elif [ "${MODE}" == "destroy" ]; then ## Destroy the environment created
-
+  uninstall
   cleanUpEnvironment
+elif [ "${MODE}" == "uninstall" ]; then ## Destroy the environment created
+  uninstall
 else
+
   printHelp
   exit 1
 fi
