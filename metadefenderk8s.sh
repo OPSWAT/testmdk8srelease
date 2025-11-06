@@ -649,6 +649,7 @@ function install(){
 }
 
 function installMDCore() {
+
     echo "Starting to install MD Core inside the K8S cluster"
     
     if [ -z "${MDCORE_LICENSE_KEY}" ]; then
@@ -767,26 +768,38 @@ function installMDCore() {
 
       ## Install Load Balancer Controller for creating LB in the AWS Account
       if [ "$LOCATION_PARAM" == "aws" ];then
-          cd $SCRIPT_PATH
-          cd "example_scripts/"
-          echo "Configuring variables for creating load balancer controller for AWS LB"
-          sed -i "s/<K8S_CLUSTER_NAME>/$cluster_name/g" eks_install_lb_controller.sh
-          sed -i "s/<K8S_REGION>/$cluster_region/g" eks_install_lb_controller.sh
-          sed -i "s/<K8S_VPC_ID>/$vpc_id/g" eks_install_lb_controller.sh
-          read -p "AWS Account ID (without '-'): " -s account_id
-          echo
-          sed -i "s/<AWS_ACCOUNT_NR>/$account_id/g" eks_install_lb_controller.sh
-          echo "Go to https://docs.aws.amazon.com/eks/latest/userguide/add-ons-images.html and pick up the image for your region ($cluster_region)"
-          read -p "IMAGE LB CONTROLLER PER REGION (No spaces): " image
-          echo
-          image_controller=$image"/amazon/aws-load-balancer-controller"
-          echo "Image Controller: "$image_controller
-          sed -i "s:<IMAGE_LB_CONTROLLER_REGION>:$image_controller:g" eks_install_lb_controller.sh
-          echo "Running script to install AWS Load Balancer Controller"
-          askProceed
-          chmod +x eks_install_lb_controller.sh
-          sed -i -e 's/\r$//' eks_install_lb_controller.sh
-          ./eks_install_lb_controller.sh
+
+          echo "Checking if AWS Load Balancer Controller is installed in the cluster"
+          RELEASE_NAME="aws-load-balancer-controller"
+          NAMESPACE="kube-system"
+
+          if helm status "$RELEASE_NAME" -n "$NAMESPACE" >/dev/null 2>&1; then
+              echo "✅ Helm release '$RELEASE_NAME' exists in namespace '$NAMESPACE'"
+              echo "Skipping installation of AWS Load Balancer Controller"
+          else
+              echo "❌ Helm release '$RELEASE_NAME' does NOT exist in namespace '$NAMESPACE'"
+              echo "Proceeding to install AWS Load Balancer Controller in the cluster"
+              cd $SCRIPT_PATH
+              cd "example_scripts/"
+              echo "Configuring variables for creating load balancer controller for AWS LB"
+              sed -i "s/<K8S_CLUSTER_NAME>/$cluster_name/g" eks_install_lb_controller.sh
+              sed -i "s/<K8S_REGION>/$cluster_region/g" eks_install_lb_controller.sh
+              sed -i "s/<K8S_VPC_ID>/$vpc_id/g" eks_install_lb_controller.sh
+              read -p "AWS Account ID (without '-'): " -s account_id
+              echo
+              sed -i "s/<AWS_ACCOUNT_NR>/$account_id/g" eks_install_lb_controller.sh
+              echo "Go to https://docs.aws.amazon.com/eks/latest/userguide/add-ons-images.html and pick up the image for your region ($cluster_region)"
+              read -p "IMAGE LB CONTROLLER PER REGION (No spaces): " image
+              echo
+              image_controller=$image"/amazon/aws-load-balancer-controller"
+              echo "Image Controller: "$image_controller
+              sed -i "s:<IMAGE_LB_CONTROLLER_REGION>:$image_controller:g" eks_install_lb_controller.sh
+              echo "Running script to install AWS Load Balancer Controller"
+              askProceed
+              chmod +x eks_install_lb_controller.sh
+              sed -i -e 's/\r$//' eks_install_lb_controller.sh
+              ./eks_install_lb_controller.sh
+          fi
       fi
 
     fi
@@ -974,11 +987,17 @@ function provisionAWS() {
     db_host=$(echo $db_host | awk -F ':' '{print $1}')
     echo $db_host
   fi 
-
+  db_password_mdss=$db_password
+  echo "MDSS DB password: "$db_password_mdss
   ##3rd Parties MDSS endpoints
   if [ "${externalDB_mdss}" == "true" ];then
     db_host_mdss=$(terraform output -raw POSTGRES_ENDPOINT)
-    db_url_mdss="Host="$db_host_mdss";Port=5432;Username="$db_user_mdss";Password="$db_password_mdss";Database=MDSS"
+    db_host_mdss=$(echo $db_host_mdss | awk -F ':' '{print $1}')
+    
+    username_postgres=$(terraform output -json POSTGRES_USERNAME)
+    echo $username_postgres
+    
+    db_url_mdss="Host="$db_host_mdss";Port=5432;Username="$username_postgres";Password="$db_password_mdss";Database=MDSS"
     echo $db_url_mdss
   fi 
   if [ "${externalRedis_mdss}" == "true" ];then
@@ -992,8 +1011,6 @@ function provisionAWS() {
     rabbit_Host_mdss=$(echo $rabbit_URI_mdss | awk '{split($0,x,":"); print x[1]}' )
     echo $rabbit_URI_mdss
     rabbit_url_mdss="amqps://"$rabbit_user_mdss":"$rabbit_password_mdss"@"$rabbit_URI_mdss
-    
-    
   fi 
   
 }
@@ -1232,9 +1249,36 @@ function uninstall() {
 function cleanUpEnvironment() {
     
     echo "Destroying infrastructure with terraform"
+    cd terraform/aws/
     if [ "$LOCATION_PARAM" == "aws" ];then
-      cd terraform/aws/
-      terraform destroy -var-file="variables/variables.tfvars"
+      echo "Checking if AWS Load Balancer Controller is installed in the cluster to uninstall it"
+      RELEASE_NAME="aws-load-balancer-controller"
+      NAMESPACE="kube-system"
+      if helm status "$RELEASE_NAME" -n "$NAMESPACE" >/dev/null 2>&1; then
+          
+          echo "✅ Helm release '$RELEASE_NAME' exists in namespace '$NAMESPACE'"
+          echo "Proceeding to uninstall AWS Load Balancer Controller"
+
+          helm uninstall aws-load-balancer-controller -n kube-system
+
+          cluster_name=$(terraform output -raw MD_CLUSTER_NAME)
+          echo $cluster_name
+
+          cluster_region=$(terraform output -raw MD_CLUSTER_REGION)
+          echo $cluster_region
+
+          eksctl delete iamserviceaccount \
+          --name="aws-load-balancer-controller$cluster_name" \
+          --namespace kube-system \
+          --cluster $cluster_name \
+          --region $cluster_region
+
+
+      fi
+      
+      terraform destroy -var-file="variables/variables.tfvars" \
+      -var="ACCESS_KEY_ID=$ACCESS_KEY_ID" \
+      -var="SECRET_ACCESS_KEY=$SECRET_ACCESS_KEY"
     elif [ "$LOCATION_PARAM" == "azure" ];then
       cd terraform/azure/
       terraform destroy \
