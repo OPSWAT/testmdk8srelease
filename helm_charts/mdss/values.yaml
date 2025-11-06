@@ -69,6 +69,7 @@ mdss-common-environment:
   NFSSERVICE_LISTENING_IP: "0.0.0.0"
   ALLOW_SSL_CONFIGURATION_FROM_UI: "False"
 
+  USERMANAGEMENTSERVICE_URL: "http://usermanagementservice"
   USERMANAGEMENTSERVICE_PORT: "7001"
   
   # These variables can be changed to reveal debug information in the application
@@ -339,6 +340,7 @@ mdss_components:
 
   mongomigrations:
     name: mongomigrations
+    module_name: mongomigrations
     custom_repo: true
     image: mdcloudservices_mongo-migrations
     command: ["/bin/sh","-c"]
@@ -568,7 +570,6 @@ mdss_components:
       - port: 27017
     persistentDir: /data/db
     is_db: true
-    is_mongo_db: true
     resources:
       requests:
         memory: "2Gi"
