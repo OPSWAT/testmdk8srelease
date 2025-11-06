@@ -338,21 +338,6 @@ mdss_components:
         cpu: "0.010"
         ephemeral-storage: "250Mi"
 
-  mongomigrations:
-    name: mongomigrations
-    module_name: mongomigrations
-    custom_repo: true
-    image: mdcloudservices_mongo-migrations
-    command: ["/bin/sh","-c"]
-    args: ['cd /mongomigrations && sh ./migrations.sh 134']
-    ports:
-      - port: 27778
-    resources:
-      requests:
-        memory: "0.125Gi"
-        cpu: "0.010"
-        ephemeral-storage: "0.25Gi"
-
   rabbitmq:
     name: rabbitmq
     image: rabbitmq:4.1.0-management-alpine
@@ -575,6 +560,21 @@ mdss_components:
         memory: "2Gi"
         cpu: "0.5"
         ephemeral-storage: "10Gi"
+        :
+  mongomigrations:
+    name: mongomigrations
+    module_name: mongomigrations
+    custom_repo: true
+    image: mdcloudservices_mongo-migrations
+    command: ["/bin/sh","-c"]
+    args: ['cd /mongomigrations && sh ./migrations.sh 134']
+    ports:
+      - port: 27778
+    resources:
+      requests:
+        memory: "0.125Gi"
+        cpu: "0.010"
+        ephemeral-storage: "0.25Gi"
 
   # ======================================= AMAZONSDK MODULE ================================================
   discoveryamazonsdkservice:
