@@ -72,11 +72,12 @@ resource "aws_mq_broker" "rabbitmq_broker" {
   broker_name = "${var.MD_CLUSTER_NAME}-mq-broker"
 
   engine_type        = "RabbitMQ"
-  engine_version     = "3.11.20"
+  engine_version     = "3.13"
   host_instance_type = "mq.m5.large"
   deployment_mode    = "CLUSTER_MULTI_AZ"
   security_groups    = [aws_security_group.rabbitmq_security_group[0].id]
   subnet_ids         = var.PRIVATE_SUBNETS
+  auto_minor_version_upgrade = true
 
   user {
     username = var.MQ_USERNAME

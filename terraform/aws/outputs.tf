@@ -14,6 +14,10 @@ output "POSTGRES_ENDPOINT" {
   value =  var.DEPLOY_RDS_POSTGRES_DB ? module.aws_rds_postgres.0.postgres_endpoint : null
 }
 
+output "POSTGRES_USERNAME" {
+  value = var.DEPLOY_RDS_POSTGRES_DB ? module.aws_rds_postgres.0.postgres_username : null
+}
+
 output "REDIS_ENDPOINT" {
   value = var.DEPLOY_REDIS ? module.aws_mdss.redis_endpoint : null
 }
