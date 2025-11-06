@@ -1098,11 +1098,11 @@ mdss_components:
         ephemeral-storage: "0.5Gi"
 
   # ======================================= ORACLE MODULE ================================================
-  discoveryoracleservice:
-    name: discoveryoracleservice
+  discoveryoraclesdkservice:
+    name: discoveryoraclesdkservice
     module_name: oracle
     custom_repo: true
-    image: mdcloudservices_discoveryoracle
+    image: mdcloudservices_discoveryoraclesdk
     extra_labels:
       aws-type: fargate
     resources:
@@ -1111,11 +1111,11 @@ mdss_components:
         cpu: "1.000"
         ephemeral-storage: "0.5Gi"
 
-  remediationsservice-oracle:
-    name: remediationsservice-oracle
+  remediationsservice-oraclesdk:
+    name: remediationsservice-oraclesdk
     module_name: oracle
     custom_repo: true
-    image: mdcloudservices_remediationsoracle
+    image: mdcloudservices_remediationsoraclesdk
     extra_labels:
       aws-type: fargate
     resources:
@@ -1124,11 +1124,11 @@ mdss_components:
         cpu: "0.100"
         ephemeral-storage: "1Gi"
 
-  storagesservice-oracle:
-    name: storagesservice-oracle
+  storagesservice-oraclesdk:
+    name: storagesservice-oraclesdk
     module_name: oracle
     custom_repo: true
-    image: mdcloudservices_storagesoracle
+    image: mdcloudservices_storagesoraclesdk
     extra_labels:
       aws-type: fargate
     resources:
