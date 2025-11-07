@@ -254,8 +254,6 @@ deploy_with_mdss_db: true                 # Enable or disable the local in-clust
 # Set to false to not create any volumes or host paths in the deployment, all storage will be ephemeral
 persistance_enabled: true
 
-# Set to true to enable mongo migrations
-enable_mongo_migrations: false
 
 # Set to true to deploy with HorizontalPodAutoscaling
 
