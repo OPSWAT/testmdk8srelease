@@ -340,7 +340,7 @@ mdss_components:
 
   rabbitmq:
     name: rabbitmq
-    image: rabbitmq:4.1.0-management-alpine
+    image: rabbitmq:4.1.0-alpine
     ports:
       - port: 5672
       - port: 15672
