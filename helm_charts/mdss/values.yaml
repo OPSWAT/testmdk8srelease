@@ -69,8 +69,8 @@ mdss-common-environment:
   NFSSERVICE_LISTENING_IP: "0.0.0.0"
   ALLOW_SSL_CONFIGURATION_FROM_UI: "False"
 
-  USERMANAGEMENTSERVICE_URL: "http://usermanagementservice"
-  USERMANAGEMENTSERVICE_PORT: "7001"
+  IDENTITY_SERVICE_URL: "http://identityservice"
+  IDENTITY_SERVICE_PORT: "7001"
   
   # These variables can be changed to reveal debug information in the application
   LOG_LEVEL: "4"
@@ -530,10 +530,10 @@ mdss_components:
         cpu: "0.100"
         ephemeral-storage: "0.5Gi"
 
-  usermanagementservice:
-    name: usermanagementservice
+  identityservice:
+    name: identityservice
     custom_repo: true
-    image: mdcloudservices_usermanagement
+    image: mdcloudservices_identityservice
     ports:
       - port: 7001
     extra_labels:
