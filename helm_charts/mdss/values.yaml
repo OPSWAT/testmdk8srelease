@@ -320,9 +320,9 @@ mdss_components:
     is_db: true
     resources:
       requests:
-        memory: "2Gi"
-        cpu: "0.5"
-        ephemeral-storage: "10Gi"
+        memory: "12Gi"
+        cpu: "1.5"
+        ephemeral-storage: "9Gi"
 
   pgmigrations:
     name: pgmigrations
@@ -334,7 +334,7 @@ mdss_components:
       requests:
         memory: "0.125Gi"
         cpu: "0.010"
-        ephemeral-storage: "250Mi"
+        ephemeral-storage: "2Gi"
 
   rabbitmq:
     name: rabbitmq
@@ -354,9 +354,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.5Gi"
-        cpu: "0.5"
-        ephemeral-storage: "1Gi"
+        memory: "3Gi"
+        cpu: "3.0"
+        ephemeral-storage: "7Gi"
   
   redis:
     name: redis
@@ -367,9 +367,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.125Gi"
-        cpu: "0.100"
-        ephemeral-storage: "0.2Gi"
+        memory: "6Gi"
+        cpu: "2.0"
+        ephemeral-storage: "7Gi"
 
   licensingservice:
     name: licensingservice
@@ -381,9 +381,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.125Gi"
-        cpu: "0.010"
-        ephemeral-storage: "0.25Gi"
+        memory: "1Gi"
+        cpu: "0.8"
+        ephemeral-storage: "7Gi"
   
   discoveryservice:
     name: discoveryservice
@@ -393,9 +393,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.5Gi"
-        cpu: "1.000"
-        ephemeral-storage: "0.5Gi"
+        memory: "3Gi"
+        cpu: "3.0"
+        ephemeral-storage: "7Gi"
 
   scanningservice:
     name: scanningservice
@@ -405,9 +405,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "1Gi"
-        cpu: "0.500"
-        ephemeral-storage: "0.5Gi"
+        memory: "6Gi"
+        cpu: "3.0"
+        ephemeral-storage: "7Gi"
   
   notificationservice:
     name: notificationservice
@@ -417,9 +417,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.010"
-        ephemeral-storage: "0.5Gi"
+        memory: "0.75Gi"
+        cpu: "0.4"
+        ephemeral-storage: "7Gi"
 
   jobdispatcher:
     name: jobdispatcher
@@ -429,9 +429,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.050"
-        ephemeral-storage: "0.5Gi"
+        memory: "3Gi"
+        cpu: "2.0"
+        ephemeral-storage: "7Gi"
   
   loadbalancerservice:
     name: loadbalancerservice
@@ -441,9 +441,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.100"
-        ephemeral-storage: "0.5Gi"
+        memory: "1.5Gi"
+        cpu: "1.0"
+        ephemeral-storage: "7Gi"
 
   loggingservice:
     name: loggingservice
@@ -453,9 +453,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.050"
-        ephemeral-storage: "0.5Gi"
+        memory: "3Gi"
+        cpu: "1.0"
+        ephemeral-storage: "7Gi"
 
   remediationsservice:
     name: remediationsservice
@@ -465,9 +465,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.100"
-        ephemeral-storage: "0.5Gi"
+        memory: "3Gi"
+        cpu: "2.0"
+        ephemeral-storage: "7Gi"
   
   storagesservice:
     name: storagesservice
@@ -477,9 +477,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.010"
-        ephemeral-storage: "0.5Gi"
+        memory: "0.75Gi"
+        cpu: "0.2"
+        ephemeral-storage: "7Gi"
       
   workflowmanagerservice:
     name: workflowmanagerservice
@@ -489,9 +489,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.100"
-        ephemeral-storage: "0.5Gi"
+        memory: "1.5Gi"
+        cpu: "1.0"
+        ephemeral-storage: "7Gi"
   
   apigateway:
     name: apigateway
@@ -507,9 +507,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.5Gi"
-        cpu: "0.100"
-        ephemeral-storage: "0.5Gi"
+        memory: "3Gi"
+        cpu: "1.5"
+        ephemeral-storage: "7Gi"
 
   webclient:
     name: webclient
@@ -526,9 +526,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.100"
-        ephemeral-storage: "0.5Gi"
+        memory: "3Gi"
+        cpu: "1.0"
+        ephemeral-storage: "7Gi"
 
   identityservice:
     name: identityservice
@@ -540,9 +540,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.010"
-        ephemeral-storage: "0.5Gi"
+        memory: "1.5Gi"
+        cpu: "0.8"
+        ephemeral-storage: "7Gi"
 
 # ======================================= MONGOMIGRATIONS MODULE ================================================
   mongodb:
@@ -557,7 +557,7 @@ mdss_components:
       requests:
         memory: "2Gi"
         cpu: "0.5"
-        ephemeral-storage: "10Gi"
+        ephemeral-storage: "7Gi"
   
   mongomigrations:
     name: mongomigrations
@@ -572,7 +572,7 @@ mdss_components:
       requests:
         memory: "0.125Gi"
         cpu: "0.010"
-        ephemeral-storage: "0.25Gi"
+        ephemeral-storage: "7Gi"
 
   # ======================================= AMAZONSDK MODULE ================================================
   discoveryamazonsdkservice:
@@ -584,9 +584,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "1.000"
-        ephemeral-storage: "0.5Gi"
+        memory: "1.5Gi"
+        cpu: "2.5"
+        ephemeral-storage: "7Gi"
 
   remediationsservice-amazonsdk:
     name: remediationsservice-amazonsdk
@@ -597,9 +597,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.100"
-        ephemeral-storage: "1Gi"
+        memory: "6Gi"
+        cpu: "2.0"
+        ephemeral-storage: "7Gi"
   
   storagesservice-amazonsdk:
     name: storagesservice-amazonsdk
@@ -610,9 +610,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.010"
-        ephemeral-storage: "0.5Gi"
+        memory: "0.75Gi"
+        cpu: "0.2"
+        ephemeral-storage: "7Gi"
   # ======================================= AZUREBLOB MODULE ================================================
   discoveryazureblobservice:
     name: discoveryazureblobservice
@@ -623,9 +623,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "1.000"
-        ephemeral-storage: "0.5Gi"
+        memory: "1.5Gi"
+        cpu: "2.5"
+        ephemeral-storage: "7Gi"
 
   remediationsservice-azureblob:
     name: remediationsservice-azureblob
@@ -636,9 +636,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.100"
-        ephemeral-storage: "1Gi"
+        memory: "6Gi"
+        cpu: "2.0"
+        ephemeral-storage: "7Gi"
       
   storagesservice-azureblob:
     name: storagesservice-azureblob
@@ -649,9 +649,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.010"
-        ephemeral-storage: "0.5Gi"
+        memory: "0.75Gi"
+        cpu: "0.2"
+        ephemeral-storage: "7Gi"
   # ======================================= ALIBABACLOUD MODULE ================================================
   discoveryalibabacloudservice:
     name: discoveryalibabacloudservice
@@ -662,9 +662,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "1.000"
-        ephemeral-storage: "0.5Gi"
+        memory: "1.5Gi"
+        cpu: "2.5"
+        ephemeral-storage: "7Gi"
   
   remediationsservice-alibabacloud:
     name: remediationsservice-alibabacloud
@@ -675,9 +675,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.100"
-        ephemeral-storage: "1Gi"
+        memory: "6Gi"
+        cpu: "2.0"
+        ephemeral-storage: "7Gi"
   
   storagesservice-alibabacloud:
     name: storagesservice-alibabacloud
@@ -688,9 +688,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.010"
-        ephemeral-storage: "0.5Gi"
+        memory: "0.75Gi"
+        cpu: "0.2"
+        ephemeral-storage: "7Gi"
   # ======================================= GOOGLECLOUD MODULE ================================================
   discoverygooglecloudservice:
     name: discoverygooglecloudservice
@@ -701,9 +701,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "1.000"
-        ephemeral-storage: "0.5Gi"
+        memory: "1.5Gi"
+        cpu: "2.5"
+        ephemeral-storage: "7Gi"
   
   remediationsservice-googlecloud:
     name: remediationsservice-googlecloud
@@ -714,9 +714,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.100"
-        ephemeral-storage: "1Gi"
+        memory: "6Gi"
+        cpu: "2.0"
+        ephemeral-storage: "7Gi"
   
   storagesservice-googlecloud:
     name: storagesservice-googlecloud
@@ -727,9 +727,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.010"
-        ephemeral-storage: "0.5Gi"
+        memory: "0.75Gi"
+        cpu: "0.2"
+        ephemeral-storage: "7Gi"
   # ======================================= BOX MODULE ================================================
   discoveryboxservice:
     name: discoveryboxservice
@@ -740,9 +740,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "1.000"
-        ephemeral-storage: "0.5Gi"
+        memory: "1.5Gi"
+        cpu: "2.5"
+        ephemeral-storage: "7Gi"
   
   remediationsservice-box:
     name: remediationsservice-box
@@ -753,9 +753,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.100"
-        ephemeral-storage: "1Gi"
+        memory: "6Gi"
+        cpu: "2.0"
+        ephemeral-storage: "7Gi"
       
   storagesservice-box:
     name: storagesservice-box
@@ -766,9 +766,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.010"
-        ephemeral-storage: "0.5Gi"
+        memory: "0.75Gi"
+        cpu: "0.2"
+        ephemeral-storage: "7Gi"
   # ======================================= AZUREFILES MODULE ================================================
   discoveryazurefilesservice:
     name: discoveryazurefilesservice
@@ -779,9 +779,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "1.000"
-        ephemeral-storage: "0.5Gi"
+        memory: "1.5Gi"
+        cpu: "2.5"
+        ephemeral-storage: "7Gi"
   
   remediationsservice-azurefiles:
     name: remediationsservice-azurefiles
@@ -792,9 +792,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.100"
-        ephemeral-storage: "1Gi"
+        memory: "6Gi"
+        cpu: "2.0"
+        ephemeral-storage: "7Gi"
   
   storagesservice-azurefiles:
     name: storagesservice-azurefiles
@@ -805,9 +805,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.010"
-        ephemeral-storage: "0.5Gi"
+        memory: "0.75Gi"
+        cpu: "0.2"
+        ephemeral-storage: "7Gi"
   # ======================================= SMB MODULE ================================================
   discoverysmbservice:
     name: discoverysmbservice
@@ -818,9 +818,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "1.000"
-        ephemeral-storage: "0.5Gi"
+        memory: "1.5Gi"
+        cpu: "2.5"
+        ephemeral-storage: "7Gi"
   
   remediationsservice-smb:
     name: remediationsservice-smb
@@ -831,9 +831,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.100"
-        ephemeral-storage: "1Gi"
+        memory: "6Gi"
+        cpu: "2.0"
+        ephemeral-storage: "7Gi"
   
   storagesservice-smb:
     name: storagesservice-smb
@@ -844,9 +844,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.010"
-        ephemeral-storage: "0.5Gi"
+        memory: "0.75Gi"
+        cpu: "0.2"
+        ephemeral-storage: "7Gi"
   
   smbservice:
     name: smbservice
@@ -861,7 +861,7 @@ mdss_components:
       requests:
         memory: "0.5Gi"
         cpu: "0.500"
-        ephemeral-storage: "0.5Gi"
+        ephemeral-storage: "7Gi"
   # ======================================= GRAPH MODULE ================================================
   discoverygraphservice:
     name: discoverygraphservice
@@ -872,9 +872,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "1.000"
-        ephemeral-storage: "0.5Gi"
+        memory: "1.5Gi"
+        cpu: "2.5"
+        ephemeral-storage: "7Gi"
   
   remediationsservice-graph:
     name: remediationsservice-graph
@@ -885,9 +885,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.100"
-        ephemeral-storage: "1Gi"
+        memory: "6Gi"
+        cpu: "2.0"
+        ephemeral-storage: "7Gi"
       
   storagesservice-graph:
     name: storagesservice-graph
@@ -898,9 +898,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.010"
-        ephemeral-storage: "0.5Gi"
+        memory: "0.75Gi"
+        cpu: "0.2"
+        ephemeral-storage: "7Gi"
   
   # ======================================= FTP MODULE ================================================
   discoveryftpservice:
@@ -912,9 +912,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "1.000"
-        ephemeral-storage: "0.5Gi"
+        memory: "1.5Gi"
+        cpu: "2.5"
+        ephemeral-storage: "7Gi"
 
   remediationsservice-ftp:
     name: remediationsservice-ftp
@@ -925,9 +925,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.100"
-        ephemeral-storage: "1Gi"
+        memory: "6Gi"
+        cpu: "2.0"
+        ephemeral-storage: "7Gi"
   
   storagesservice-ftp:
     name: storagesservice-ftp
@@ -938,9 +938,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.010"
-        ephemeral-storage: "0.5Gi"
+        memory: "0.75Gi"
+        cpu: "0.2"
+        ephemeral-storage: "7Gi"
 
   # ======================================= SFTP MODULE ================================================
   discoverysftpservice:
@@ -952,9 +952,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "1.000"
-        ephemeral-storage: "0.5Gi"
+        memory: "1.5Gi"
+        cpu: "2.5"
+        ephemeral-storage: "7Gi"
   
   remediationsservice-sftp:
     name: remediationsservice-sftp
@@ -965,9 +965,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.100"
-        ephemeral-storage: "1Gi"
+        memory: "6Gi"
+        cpu: "2.0"
+        ephemeral-storage: "7Gi"
   
   storagesservice-sftp:
     name: storagesservice-sftp
@@ -978,9 +978,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.010"
-        ephemeral-storage: "0.5Gi"
+        memory: "0.75Gi"
+        cpu: "0.2"
+        ephemeral-storage: "7Gi"
   
   sftpservice:
     name: sftpservice
@@ -998,7 +998,7 @@ mdss_components:
       requests:
         memory: "0.25Gi"
         cpu: "0.500"
-        ephemeral-storage: "0.5Gi"
+        ephemeral-storage: "7Gi"
       
   # ======================================= NFS MODULE ================================================
   discoverynfsservice:
@@ -1010,9 +1010,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "1.000"
-        ephemeral-storage: "0.5Gi"
+        memory: "1.5Gi"
+        cpu: "2.5"
+        ephemeral-storage: "7Gi"
   
   remediationsservice-nfs:
     name: remediationsservice-nfs
@@ -1023,9 +1023,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.100"
-        ephemeral-storage: "1Gi"
+        memory: "6Gi"
+        cpu: "2.0"
+        ephemeral-storage: "7Gi"
   
   storagesservice-nfs:
     name: storagesservice-nfs
@@ -1036,9 +1036,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.010"
-        ephemeral-storage: "0.5Gi"
+        memory: "0.75Gi"
+        cpu: "0.2"
+        ephemeral-storage: "7Gi"
   
   nfsservice:
     name: nfsservice
@@ -1053,7 +1053,7 @@ mdss_components:
       requests:
         memory: "0.5Gi"
         cpu: "0.500"
-        ephemeral-storage: "0.5Gi"
+        ephemeral-storage: "7Gi"
 
  # ======================================= MFT MODULE ================================================
   discoverymftservice:
@@ -1065,9 +1065,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "1.000"
-        ephemeral-storage: "0.5Gi"
+        memory: "1.5Gi"
+        cpu: "2.5"
+        ephemeral-storage: "7Gi"
   
   remediationsservice-mft:
     name: remediationsservice-mft
@@ -1078,9 +1078,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.100"
-        ephemeral-storage: "1Gi"
+        memory: "6Gi"
+        cpu: "2.0"
+        ephemeral-storage: "7Gi"
       
   storagesservice-mft:
     name: storagesservice-mft
@@ -1091,9 +1091,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.010"
-        ephemeral-storage: "0.5Gi"
+        memory: "0.75Gi"
+        cpu: "0.2"
+        ephemeral-storage: "7Gi"
 
   # ======================================= ORACLE MODULE ================================================
   discoveryoraclesdkservice:
@@ -1105,9 +1105,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "1.000"
-        ephemeral-storage: "0.5Gi"
+        memory: "1.5Gi"
+        cpu: "2.5"
+        ephemeral-storage: "7Gi"
 
   remediationsservice-oraclesdk:
     name: remediationsservice-oraclesdk
@@ -1118,9 +1118,9 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.100"
-        ephemeral-storage: "1Gi"
+        memory: "6Gi"
+        cpu: "2.0"
+        ephemeral-storage: "7Gi"
 
   storagesservice-oraclesdk:
     name: storagesservice-oraclesdk
@@ -1131,6 +1131,6 @@ mdss_components:
       aws-type: fargate
     resources:
       requests:
-        memory: "0.25Gi"
-        cpu: "0.010"
-        ephemeral-storage: "0.5Gi"
+        memory: "0.75Gi"
+        cpu: "0.2"
+        ephemeral-storage: "7Gi"
