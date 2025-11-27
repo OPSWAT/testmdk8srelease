@@ -1249,8 +1249,9 @@ function uninstall() {
 function cleanUpEnvironment() {
     
     echo "Destroying infrastructure with terraform"
-    cd terraform/aws/
+    
     if [ "$LOCATION_PARAM" == "aws" ];then
+      cd terraform/aws/
       echo "Checking if AWS Load Balancer Controller is installed in the cluster to uninstall it"
       RELEASE_NAME="aws-load-balancer-controller"
       NAMESPACE="kube-system"
