@@ -28,7 +28,7 @@ spec:
   sessionAffinity: {{ $component.sessionAffinity }}
   {{- end }}
   selector:
-      app: {{ $component.name | quote }}
+      component: {{ $component.name | quote }}
 status:
   loadBalancer: {}
 {{ end }}
