@@ -241,7 +241,7 @@ mdssc_components:
       requests:
         memory: "6Gi"
         cpu: "1.5"
-        ephemeral-storage: "9Gi"
+        ephemeral-storage: "50Gi"
 
   pgmigrations:
     name: pgmigrations
