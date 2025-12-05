@@ -130,9 +130,11 @@ spec:
         - name: {{ $component.tls.certSecret }}
           secret:
             secretName: {{ $component.tls.certSecret }}
+            defaultMode: 0755
         - name: {{ $component.tls.certKeySecret }}
           secret:
             secretName: {{ $component.tls.certKeySecret }}
+            defaultMode: 0755
         {{ end }}
         {{- if $component.persistentDir }}
         {{- if eq $.Values.storage_provisioner "hostPath" }}
