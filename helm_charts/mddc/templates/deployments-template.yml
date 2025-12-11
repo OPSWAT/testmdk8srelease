@@ -2,7 +2,7 @@
 # Create a deployment for each component in mddc
 {{ range $component_name, $component := .Values.mddc_components }}
 
-{{ if or $.Values.deploy_with_mddc_db (not $component.is_db)  }}
+{{ if and (not (eq $component.enabled false)) (or $.Values.deploy_with_mddc_db (not $component.is_db))  }}
 ---
 apiVersion: apps/v1
 kind: Deployment
