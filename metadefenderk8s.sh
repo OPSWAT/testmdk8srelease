@@ -1230,7 +1230,7 @@ function installMDSSC () {
     if [ "$LOCATION_PARAM" == "local" ];then
       helm upgrade --install mdssc mdssc/ --namespace $namespace --create-namespace \
       --set mdssc_ingress.enabled=$ingress_enabled
-    else
+    elif [ "$LOCATION_PARAM" == "aws" ];then
       if $externalRabbit_mdssc ;then
         rabbit_replicas_mdssc=0
         rabbit_mq_port_mdssc="5671"
@@ -1243,94 +1243,33 @@ function installMDSSC () {
         redis_replicas_mdssc=1
       fi
 
-      if [ "$LOCATION_PARAM" == "aws" ];then
-          helm_file="mdssc-aws-eks-values.yml"
-          if [ "$ipInternal" == "true" ];then
-            ipInternal="nlb-ip"
-          else
-            ipInternal="external"
-          fi
-          helm upgrade --install mdssc mdssc/ \
-          --namespace $namespace \
-          --create-namespace \
-          -f $helm_file \
-          --set mdssc_ingress.enabled=$ingress_enabled \
-          --set POSTGRESQL_URL=$db_url_mdssc \
-          --set MDSSC_DB_USER=$db_user_mdssc \
-          --set MDSSC_DB_PASSWORD=$db_password_mdssc \
-          --set MDSSC_DB_HOST=$db_host_mdssc \
-          --set mdssc-common-environment.RABBITMQ_URI=$rabbit_url_mdssc \
-          --set mdssc-common-environment.RABBITMQ_HOST=$rabbit_Host_mdssc \
-          --set mdssc-common-environment.CACHE_SERVICE_URI=$redis_uri_mdssc \
-          --set mdssc-common-environment.CACHE_SERVICE_URL=$redis_host_mdssc \
-          --set mdssc_components.rabbitmq.replicas=$rabbit_replicas_mdssc \
-          --set mdssc_components.redis.replicas=$redis_replicas_mdssc \
-          --set mdssc_components.frontend.service_annotations."service\.beta\.kubernetes\.io/aws-load-balancer-type"=$ipInternal \
-          --set deploy_with_mdssc_db=$k8s_db_mdssc 
-
-      elif [ "$LOCATION_PARAM" == "azure" ]; then
-          helm_file="mdssc-azure-aks-values.yml"
-
-          helm upgrade --install mdssc mdssc/ \
-          --namespace $namespace \
-          --create-namespace \
-          -f $helm_file \
-          --set mdssc_ingress.enabled=$ingress_enabled \
-          --set POSTGRESQL_URL=$db_url_mdssc \
-          --set MDSSC_DB_USER=$db_user_mdssc \
-          --set MDSSC_DB_PASSWORD=$db_password_mdssc \
-          --set MDSSC_DB_HOST=$db_host_mdssc \
-          --set mdssc-common-environment.RABBITMQ_URI=$rabbit_url_mdssc \
-          --set mdssc-common-environment.RABBITMQ_HOST=$rabbit_Host_mdssc \
-          --set mdssc-common-environment.CACHE_SERVICE_URI=$redis_uri_mdssc \
-          --set mdssc-common-environment.CACHE_SERVICE_URL=$redis_host_mdssc \
-          --set mdssc_components.rabbitmq.replicas=$rabbit_replicas_mdssc \
-          --set mdssc_components.redis.replicas=$redis_replicas_mdssc \
-          --set mdssc_components.frontend.service_annotations."service\.beta\.kubernetes\.io/azure-load-balancer-internal"="'"$ipInternal"'" \
-          --set deploy_with_mdssc_db=$k8s_db_mdssc 
-
-      elif [ "$LOCATION_PARAM" == "gcp" ]; then
-          helm_file="mdssc-gcloud-values.yml"
-          if [ "$privateconnection" == "true" ];then
-            db_host_mdssc="cloud-sql-proxy"
-          fi
-          if [ "$ipInternal" == "true" ];then
-            helm upgrade --install mdssc mdssc/ \
-              --namespace $namespace \
-              --create-namespace \
-              -f $helm_file \
-              --set mdssc_ingress.enabled=$ingress_enabled \
-              --set POSTGRESQL_URL=$db_url_mdssc \
-              --set MDSSC_DB_USER=$db_user_mdssc \
-              --set MDSSC_DB_PASSWORD=$db_password_mdssc \
-              --set MDSSC_DB_HOST=$db_host_mdssc \
-              --set mdssc-common-environment.RABBITMQ_URI=$rabbit_url_mdssc \
-              --set mdssc-common-environment.RABBITMQ_HOST=$rabbit_Host_mdssc \
-              --set mdssc-common-environment.CACHE_SERVICE_URI=$redis_uri_mdssc \
-              --set mdssc-common-environment.CACHE_SERVICE_URL=$redis_host_mdssc \
-              --set mdssc_components.rabbitmq.replicas=$rabbit_replicas_mdssc \
-              --set mdssc_components.redis.replicas=$redis_replicas_mdssc \
-              --set mdssc_components.frontend.service_annotations."networking\.gke\.io/load-balancer-type"="Internal" \
-              --set deploy_with_mdssc_db=$k8s_db_mdssc
-          else
-            helm upgrade --install mdssc mdssc/ \
-            --namespace $namespace \
-            --create-namespace \
-            -f $helm_file \
-            --set mdssc_ingress.enabled=$ingress_enabled \
-            --set POSTGRESQL_URL=$db_url_mdssc \
-            --set MDSSC_DB_USER=$db_user_mdssc \
-            --set MDSSC_DB_PASSWORD=$db_password_mdssc \
-            --set MDSSC_DB_HOST=$db_host_mdssc \
-            --set mdssc-common-environment.RABBITMQ_URI=$rabbit_url_mdssc \
-            --set mdssc-common-environment.RABBITMQ_HOST=$rabbit_Host_mdssc \
-            --set mdssc-common-environment.CACHE_SERVICE_URI=$redis_uri_mdssc \
-            --set mdssc-common-environment.CACHE_SERVICE_URL=$redis_host_mdssc \
-            --set mdssc_components.rabbitmq.replicas=$rabbit_replicas_mdssc \
-            --set mdssc_components.redis.replicas=$redis_replicas_mdssc \
-            --set deploy_with_mdssc_db=$k8s_db_mdssc 
-          fi
+      helm_file="mdssc-aws-eks-values.yml"
+      if [ "$ipInternal" == "true" ];then
+        ipInternal="nlb-ip"
+      else
+        ipInternal="external"
       fi
+      helm upgrade --install mdssc mdssc/ \
+      --namespace $namespace \
+      --create-namespace \
+      -f $helm_file \
+      --set mdssc_ingress.enabled=$ingress_enabled \
+      --set POSTGRESQL_URL=$db_url_mdssc \
+      --set MDSSC_DB_USER=$db_user_mdssc \
+      --set MDSSC_DB_PASSWORD=$db_password_mdssc \
+      --set MDSSC_DB_HOST=$db_host_mdssc \
+      --set mdssc-common-environment.RABBITMQ_URI=$rabbit_url_mdssc \
+      --set mdssc-common-environment.RABBITMQ_HOST=$rabbit_Host_mdssc \
+      --set mdssc-common-environment.CACHE_SERVICE_URI=$redis_uri_mdssc \
+      --set mdssc-common-environment.CACHE_SERVICE_URL=$redis_host_mdssc \
+      --set mdssc_components.rabbitmq.replicas=$rabbit_replicas_mdssc \
+      --set mdssc_components.redis.replicas=$redis_replicas_mdssc \
+      --set mdssc_components.frontend.service_annotations."service\.beta\.kubernetes\.io/aws-load-balancer-type"=$ipInternal \
+      --set deploy_with_mdssc_db=$k8s_db_mdssc 
+    else
+      echo "MDSSC is currently only supported on AWS and local deployments"
+      echo "Azure and GCP support for MDSSC is not yet available"
+      exit 1
     fi
 
 }
