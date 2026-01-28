@@ -34,6 +34,14 @@ data:
       location /api {
         proxy_pass http://apigateway;
         
+        # Set Content-Length to 0 if not provided (for POST with no body)
+        set $fixed_content_length $content_length;
+        if ($fixed_content_length = "") {
+            set $fixed_content_length "0";
+        }
+
+        proxy_set_header Content-Length  $fixed_content_length;
+
         proxy_set_header Host            $host;  
         limit_except GET POST PUT DELETE PATCH OPTIONS { deny  all; }
         add_header Referrer-Policy "no-referrer" always;
@@ -85,6 +93,15 @@ data:
         proxy_pass http://apigateway;
 
         proxy_set_header Host            $host; 
+
+        # Set Content-Length to 0 if not provided (for POST with no body)
+        set $fixed_content_length $content_length;
+        if ($fixed_content_length = "") {
+            set $fixed_content_length "0";
+        }
+
+        proxy_set_header Content-Length  $fixed_content_length;
+
         limit_except GET POST PUT DELETE PATCH OPTIONS { deny  all; }
         add_header Referrer-Policy "no-referrer" always;
         add_header X-Content-Type-Options "nosniff" always;
