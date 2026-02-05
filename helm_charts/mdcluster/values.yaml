@@ -1,29 +1,31 @@
 # Default values for mddc. These will also be included in the environment of each mddc container
 env: 
-  user: "<MDDC_USER>"
-  password: "<MDDC_PASSWORD>"
+  user: "admin"
+  password: "admin"
   apikey: null
-  email: "<MDDC_EMAIL>"
+  email: "pablo.hernandez@opswat.com"
   rabbitmq_host: "rabbitmq"
   rabbitmq_port: "5672"
-  rabbitmq_user: "<RABBITMQ_DEFAULT_USER>"
-  rabbitmq_password: "<RABBITMQ_DEFAULT_PASS>"
+  rabbitmq_user: "OPSWATAdmin"
+  rabbitmq_password: "OPSWATAdminPassword"
   redis_host: "redis"
   redis_port: "6379"
   #redis_user: "default" # Uncomment if using Redis ACLs
   #redis_password: "<REDIS_PASSWORD>" # Uncomment if using Redis ACLs
   postgresql_host: postgres
   postgresql_port: "5432"
-  postgresql_user: "<POSTGRES_USER>"
-  postgresql_password: "<POSTGRES_PASSWORD>"
+  postgresql_user: "OPSWATAdmin"
+  postgresql_password: "OPSWATAdminPassword"
   LOG_LEVEL: "info"
-  connection_key: "<MDDC_CONNCETION_KEY>"
-  encryption_key: "<MDDC_ENCRYPTION_KEY>"
-  license_key: "<LICENSE_KEY>"
+  connection_key: "234324324534252345frerfgdfgdfgdfgdfg"
+  encryption_key: "12345678123456781234567812345678"
+  license_key: "bmCf-7BDR-u65b-pYud-crCx-ZERv-e4TD-jBRH"
   
   
 # Generate secrets in Kubernetes Cluster for MetaDefender Cluster username, password, postgres user and password. Set to false in case of inputing the secrets from external secrets
 mddc_generate_secrets: true
+# Generate configmaps in Kubernetes Cluster for MetaDefender Cluster. Set to false in case of inputing the configmaps from external parameters store
+mddc_generate_configmaps: true
 
 
 # Set to true if the respective database engine should also be deployed
@@ -146,7 +148,7 @@ mddc_config_map_env_name: 'mddc-env'
 mddc_components:
   postgres:
     name: postgres
-    image: postgres:14.17
+    image: postgres:17.6
     env:
       - name: POSTGRES_PASSWORD
         valueFrom:
@@ -208,7 +210,7 @@ mddc_components:
     name: identity-service
     custom_repo: true
     enabled: true
-    image: metadefender-distributed-cluster:identity-service-2.5.1-debian-12
+    image: metadefender-cluster:identity-service-2.5.2-debian-12
     ports:
       - port: 8891
     extra_labels:
@@ -217,12 +219,29 @@ mddc_components:
       requests:
         memory: "0.5Gi"
         cpu: "0.010"
+    initContainers:
+    - name: wait-for-services
+      image: busybox:latest
+      envFrom:
+        - configMapRef:
+            name: identity-service
+            optional: true
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          echo "Waiting for postgres..."
+          echo "Using host: $MDCLS_IDENTITY_SERVICE_DB_HOST and port: $MDCLS_IDENTITY_SERVICE_DB_PORT"
+          until nc -vz $MDCLS_IDENTITY_SERVICE_DB_HOST $MDCLS_IDENTITY_SERVICE_DB_PORT; do
+            echo "$(date) Still waiting for $MDCLS_IDENTITY_SERVICE_DB_HOST $MDCLS_IDENTITY_SERVICE_DB_PORT"
+            sleep 2
+          done
+          echo "$MDCLS_IDENTITY_SERVICE_DB_HOST $MDCLS_IDENTITY_SERVICE_DB_PORT is up!"
     
   file-storage:
     name: file-storage
     custom_repo: true
     enabled: true
-    image: metadefender-distributed-cluster:file-storage-2.5.1-debian-12
+    image: metadefender-cluster:file-storage-2.5.2-debian-12
     ports:
       - port: 8890
     extra_labels:
@@ -241,11 +260,12 @@ mddc_components:
             - name: file-storage
               mountPath: /opt/opswat/mddc-file-storage
 
+
   control-center:
     name: control-center
     custom_repo: true
     enabled: true
-    image: metadefender-distributed-cluster:control-center-2.5.1-debian-12
+    image: metadefender-cluster:control-center-2.5.2-debian-12
     ports:
       - port: 8892
     extra_labels:
@@ -278,24 +298,28 @@ mddc_components:
             sleep 2
           done
           echo "file-storage:8890 is up!"
+          echo "Waiting for redis:6379..."
+          until nc -vz redis 6379; do
+            echo "$(date) Still waiting for redis:6379"
+            sleep 2
+          done
+          echo "redis:6379 is up!"
+          echo "Waiting for rabbitmq:5672..."
+          until nc -vz rabbitmq 5672; do
+            echo "$(date) Still waiting for rabbitmq:5672"
+            sleep 2
+          done
+          echo "rabbitmq:5672 is up!"
 
 
   worker-api-gateway:
     name: worker-api-gateway
     custom_repo: true
     enabled: true
-    image: metadefender-distributed-cluster:worker-api-gateway-2.5.1-debian-12
+    image: metadefender-cluster:worker-api-gateway-2.5.2-debian-12
     ports:
       - port: 8893
       - port: 8899
-    extra_labels:
-      aws-type: fargate
-    service_type: LoadBalancer
-    sessionAffinity: ClientIP
-    service_annotations:
-      service.beta.kubernetes.io/aws-load-balancer-type: external
-      service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
-      service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing  
     resources:
       requests:
         memory: "0.5Gi"
@@ -316,6 +340,7 @@ mddc_components:
             echo "$(date) Still waiting for control-center:8892"
             sleep 3
           done
+          sleep 30 # Extra wait time to ensure control-center is fully up and running
           echo "control-center:8892 is up!"
 
 
@@ -324,7 +349,7 @@ mddc_components:
     name: worker-core
     custom_repo: true
     enabled: true
-    image: metadefender-distributed-cluster:worker-core-2.5.1-debian-12
+    image: metadefender-cluster:worker-core-2.5.2-debian-12
     ports:
       - port: 8893
     extra_labels:
@@ -350,4 +375,35 @@ mddc_components:
             echo "$(date) Still waiting for control-center:8892"
             sleep 3
           done
+          sleep 30 # Extra wait time to ensure control-center is fully up and running
+          echo "control-center:8892 is up!"
+
+  worker-callback-service:
+    name: worker-callback-service
+    custom_repo: true
+    enabled: true
+    image: metadefender-cluster:worker-callback-service-2.5.2-debian-12
+    ports:
+      - port: 8894
+    resources:
+      requests:
+        memory: "0.5Gi"
+        cpu: "1.0"
+    hpa:
+      enabled: false
+      minReplicas: 2
+      maxReplicas: 3
+      cpuTargetUtilization: 85
+    initContainers:
+    - name: wait-for-services
+      image: busybox:latest
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          echo "Waiting for control-center:8892..."
+          until nc -vz control-center 8892; do
+            echo "$(date) Still waiting for control-center:8892"
+            sleep 3
+          done
+          sleep 30 # Extra wait time to ensure control-center is fully up and running 
           echo "control-center:8892 is up!"

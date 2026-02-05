@@ -151,17 +151,21 @@ Redis configuration with global fallback
 {{- end -}}
 
 {{- define "mddc.redis.user" -}}
+{{- $user := "" -}}
 {{- if and .Values.global .Values.global.redis .Values.global.redis.user -}}
-{{- .Values.global.redis.user -}}
-{{- else -}}
-{{- .Values.env.redis_user -}}
+{{- $user = .Values.global.redis.user -}}
+{{- else if .Values.env.redis_user -}}
+{{- $user = .Values.env.redis_user -}}
 {{- end -}}
+{{- $user -}}
 {{- end -}}
 
 {{- define "mddc.redis.password" -}}
+{{- $password := "" -}}
 {{- if and .Values.global .Values.global.redis .Values.global.redis.password -}}
-{{- .Values.global.redis.password -}}
-{{- else -}}
-{{- .Values.env.redis_password -}}
+{{- $password = .Values.global.redis.password -}}
+{{- else if .Values.env.redis_password -}}
+{{- $password = .Values.env.redis_password -}}
 {{- end -}}
+{{- $password -}}
 {{- end -}}
