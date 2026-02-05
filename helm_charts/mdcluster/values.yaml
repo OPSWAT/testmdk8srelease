@@ -1,25 +1,25 @@
 # Default values for mddc. These will also be included in the environment of each mddc container
 env: 
-  user: "admin"
-  password: "admin"
+  user: "<MDDC_USER>"
+  password: "<MDDC_PASSWORD>"
   apikey: null
-  email: "pablo.hernandez@opswat.com"
+  email: "<MDDC_EMAIL>"
   rabbitmq_host: "rabbitmq"
   rabbitmq_port: "5672"
-  rabbitmq_user: "OPSWATAdmin"
-  rabbitmq_password: "OPSWATAdminPassword"
+  rabbitmq_user: "<RABBITMQ_DEFAULT_USER>"
+  rabbitmq_password: "<RABBITMQ_DEFAULT_PASS>"
   redis_host: "redis"
   redis_port: "6379"
   #redis_user: "default" # Uncomment if using Redis ACLs
   #redis_password: "<REDIS_PASSWORD>" # Uncomment if using Redis ACLs
   postgresql_host: postgres
   postgresql_port: "5432"
-  postgresql_user: "OPSWATAdmin"
-  postgresql_password: "OPSWATAdminPassword"
+  postgresql_user: "<POSTGRES_USER>"
+  postgresql_password: "<POSTGRES_PASSWORD>"
   LOG_LEVEL: "info"
-  connection_key: "234324324534252345frerfgdfgdfgdfgdfg"
-  encryption_key: "12345678123456781234567812345678"
-  license_key: "bmCf-7BDR-u65b-pYud-crCx-ZERv-e4TD-jBRH"
+  connection_key: "<MDDC_CONNCETION_KEY>"
+  encryption_key: "<MDDC_ENCRYPTION_KEY>"
+  license_key: "<LICENSE_KEY>"
   
   
 # Generate secrets in Kubernetes Cluster for MetaDefender Cluster username, password, postgres user and password. Set to false in case of inputing the secrets from external secrets
