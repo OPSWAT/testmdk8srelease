@@ -43,6 +43,12 @@ MDCORE_DB_HOST: postgres-core       # Hostname / entrypoint of the database, thi
 MDCORE_DB_PORT: "5432"              # Port for the PostgreSQL Database
 MDCORE_CERT_PATH: "/cert"
 
+CERT_KEY: |
+  <SET_MD_NAS_CERT_KEY>
+CERT: |
+  <SET_MD_NAS_CERT>
+
+
 # Set to true if the respective database engine should also be deployed
 deploy_with_core_db: true           # Enable or disable the local in-cluster PostgreSQL database
 
