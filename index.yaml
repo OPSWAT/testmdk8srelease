@@ -234,6 +234,17 @@ entries:
     version: 0.0.29
   metadefender_cluster:
   - apiVersion: v2
+    appVersion: 2.5.2
+    created: "2026-03-03T08:21:28.961248212Z"
+    description: This is a Helm chart for deploying MetaDefender Cluster (https://www.opswat.com/docs/mdcluster)
+      in a Kubernetes cluster
+    digest: e4f209d7d44df834fdb25c4c907743479002e362c184c4b34f024ccf1954f280
+    name: metadefender_cluster
+    type: application
+    urls:
+    - https://github.com/OPSWAT/metadefender-k8s/releases/download/metadefender_cluster-2.5.2/metadefender_cluster-2.5.2.tgz
+    version: 2.5.2
+  - apiVersion: v2
     appVersion: 2.5.1
     created: "2025-12-24T09:32:14.230446106Z"
     description: This is a Helm chart for deploying MetaDefender Cluster (https://www.opswat.com/docs/mdcluster)
@@ -245,6 +256,20 @@ entries:
     - https://github.com/OPSWAT/metadefender-k8s/releases/download/metadefender_cluster-2.5.1/metadefender_cluster-2.5.1.tgz
     version: 2.5.1
   metadefender_core:
+  - apiVersion: v2
+    appVersion: 5.17.1
+    created: "2026-03-03T08:21:29.095820022Z"
+    description: 'This is a Helm chart for deploying MetaDefender Core (https://www.opswat.com/products/metadefender/core)
+      in a Kubernetes cluster.   Release Notes - Environment variables to migrate
+      processing history (Pre-steps needed) - Environment variables to enable Licensing
+      Cleanup and examples for Role/Rolebinding - Fixed warning of kubernetes.io/ingress.class
+      annotation for AWS and Azure. Added control flag to still use it for GCP '
+    digest: f96103e7de66d3ee6b526faed229fd8cfc2958814b8535e7561e526b1aec3476
+    name: metadefender_core
+    type: application
+    urls:
+    - https://github.com/OPSWAT/metadefender-k8s/releases/download/metadefender_core-5.17.1/metadefender_core-5.17.1.tgz
+    version: 5.17.1
   - apiVersion: v2
     appVersion: 5.17.0
     created: "2026-01-16T09:46:22.492803891Z"
@@ -622,6 +647,18 @@ entries:
     version: 3.3.0-0
   metadefender_software_supply_chain:
   - apiVersion: v2
+    appVersion: 3.2.0
+    created: "2026-03-03T08:21:29.240388693Z"
+    description: This is a Helm chart for deploying MetaDefender Software Supply Chain
+      (https://www.opswat.com/products/metadefender/software-supply-chain) in a Kubernetes
+      cluster
+    digest: dcdf8f6e4c6223a6d8a98c91cfb51af1cd3e6899120e24775d58a908b9325af8
+    name: metadefender_software_supply_chain
+    type: application
+    urls:
+    - https://github.com/OPSWAT/metadefender-k8s/releases/download/metadefender_software_supply_chain-3.2.0/metadefender_software_supply_chain-3.2.0.tgz
+    version: 3.2.0
+  - apiVersion: v2
     appVersion: 3.1.0
     created: "2026-01-16T09:46:22.668996542Z"
     description: This is a Helm chart for deploying MetaDefender Software Supply Chain
@@ -718,6 +755,18 @@ entries:
     - https://github.com/OPSWAT/metadefender-k8s/releases/download/metadefender_software_supply_chain-2.3.2/metadefender_software_supply_chain-2.3.2.tgz
     version: 2.3.2
   metadefender_storage_security:
+  - apiVersion: v2
+    appVersion: 4.3.0
+    created: "2026-03-03T08:21:29.384140585Z"
+    description: This is a Helm chart for deploying MetaDefender for Secure Storage
+      (https://www.opswat.com/products/metadefender/storage-security) in a Kubernetes
+      cluster
+    digest: cd46831acaaad34999b9d885a6d0966a30d2486f7cce4f265b339eb9cb58baef
+    name: metadefender_storage_security
+    type: application
+    urls:
+    - https://github.com/OPSWAT/metadefender-k8s/releases/download/metadefender_storage_security-4.3.0/metadefender_storage_security-4.3.0.tgz
+    version: 4.3.0
   - apiVersion: v2
     appVersion: 4.2.0
     created: "2025-12-17T11:12:23.730631559Z"
@@ -957,4 +1006,4 @@ entries:
     urls:
     - https://github.com/OPSWAT/metadefender-k8s/releases/download/metadefender_storage_security-0.0.28/metadefender_storage_security-0.0.28.tgz
     version: 0.0.28
-generated: "2026-01-16T09:46:22.669314956Z"
+generated: "2026-03-03T08:21:29.384516803Z"
