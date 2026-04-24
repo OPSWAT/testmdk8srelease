@@ -257,6 +257,20 @@ entries:
     version: 2.5.1
   metadefender_core:
   - apiVersion: v2
+    appVersion: 5.18.0
+    created: "2026-04-24T11:45:31.969069167Z"
+    description: 'This is a Helm chart for deploying MetaDefender Core (https://www.opswat.com/products/metadefender/core)
+      in a Kubernetes cluster.   Release Notes - Environment variables to migrate
+      processing history (Pre-steps needed) - Environment variables to enable Licensing
+      Cleanup and examples for Role/Rolebinding - Fixed warning of kubernetes.io/ingress.class
+      annotation for AWS and Azure. Added control flag to still use it for GCP '
+    digest: d232135744040e24c8a58f8eb7886590c97c20c7ccf88217a70dedae70d37721
+    name: metadefender_core
+    type: application
+    urls:
+    - https://github.com/OPSWAT/testmdk8srelease/releases/download/metadefender_core-5.18.0/metadefender_core-5.18.0.tgz
+    version: 5.18.0
+  - apiVersion: v2
     appVersion: 5.17.1
     created: "2026-03-03T08:21:29.095820022Z"
     description: 'This is a Helm chart for deploying MetaDefender Core (https://www.opswat.com/products/metadefender/core)
@@ -1006,4 +1020,4 @@ entries:
     urls:
     - https://github.com/OPSWAT/metadefender-k8s/releases/download/metadefender_storage_security-0.0.28/metadefender_storage_security-0.0.28.tgz
     version: 0.0.28
-generated: "2026-03-03T08:21:29.384516803Z"
+generated: "2026-04-24T11:45:32.393491813Z"
